@@ -7,26 +7,26 @@ export default function Home() {
   const { data: session } = useSession();
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-white p-8 dark:bg-gray-900">
-      <h1 className="text-4xl font-bold text-black dark:text-white">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-8 p-8">
+      <h1 className="text-4xl font-bold text-text-primary">
         AI Form Builder
       </h1>
 
       {session ? (
-        <p className="text-black dark:text-white">
+        <p className="text-text-primary">
           Welcome, {session.user?.email ?? "user"}
         </p>
       ) : (
         <div className="flex gap-4">
           <Link
             href="/register"
-            className="rounded-full bg-black px-6 py-3 text-sm font-medium text-white dark:bg-white dark:text-black"
+            className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-text hover:bg-btn-primary-hover"
           >
             Sign up
           </Link>
           <Link
             href="/login"
-            className="rounded-full border border-black/20 px-6 py-3 text-sm font-medium text-black dark:border-white/30 dark:text-white"
+            className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
           >
             Log in
           </Link>

@@ -30,19 +30,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white p-8 dark:bg-gray-900">
+    <div className="flex min-h-screen items-center justify-center p-8">
       <form
         onSubmit={handleSubmit}
         className="flex w-full max-w-sm flex-col gap-6"
       >
-        <h1 className="text-3xl font-bold text-black dark:text-white">
+        <h1 className="text-3xl font-bold text-text-primary">
           Log in
         </h1>
 
         <div className="flex flex-col gap-2">
           <label
             htmlFor="email"
-            className="text-sm font-medium text-black dark:text-white"
+            className="text-sm font-medium text-text-primary"
           >
             Email
           </label>
@@ -52,14 +52,14 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="rounded-lg border border-black/20 bg-transparent px-4 py-2 text-black outline-none transition-colors focus:border-black dark:border-white/30 dark:text-white dark:focus:border-white"
+            className="rounded-lg border border-border-input bg-input px-4 py-2 text-text-primary outline-none transition-colors focus:border-gray-400"
           />
         </div>
 
         <div className="flex flex-col gap-2">
           <label
             htmlFor="password"
-            className="text-sm font-medium text-black dark:text-white"
+            className="text-sm font-medium text-text-primary"
           >
             Password
           </label>
@@ -69,7 +69,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="rounded-lg border border-black/20 bg-transparent px-4 py-2 text-black outline-none transition-colors focus:border-black dark:border-white/30 dark:text-white dark:focus:border-white"
+            className="rounded-lg border border-border-input bg-input px-4 py-2 text-text-primary outline-none transition-colors focus:border-gray-400"
           />
         </div>
 
@@ -79,12 +79,12 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          className="rounded-full bg-black py-3 text-sm font-medium text-white transition-opacity hover:opacity-80 dark:bg-white dark:text-black"
+          className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-text hover:bg-btn-primary-hover"
         >
           Log in
         </button>
 
-        <p className="text-center text-sm text-black dark:text-white">
+        <p className="text-center text-sm text-text-primary">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"

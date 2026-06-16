@@ -1,2 +1,76 @@
 @import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-border-input: var(--border-input);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-placeholder: var(--text-placeholder);
+  --color-btn-primary: var(--btn-primary);
+  --color-btn-primary-text: var(--btn-primary-text);
+  --color-btn-primary-hover: var(--btn-primary-hover);
+  --color-btn-secondary-text: var(--btn-secondary-text);
+  --color-btn-secondary-border: var(--btn-secondary-border);
+  --color-btn-secondary-hover: var(--btn-secondary-hover);
+  --color-btn-destructive-bg: var(--btn-destructive-bg);
+  --color-btn-destructive-text: var(--btn-destructive-text);
+  --color-btn-destructive-hover: var(--btn-destructive-hover);
+  --color-toggle-bg: var(--toggle-bg);
+  --color-toggle-active: var(--toggle-active);
+  --color-toggle-dot: var(--toggle-dot);
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+:root {
+  --page: #fafafa;
+  --surface: #ffffff;
+  --input: #ffffff;
+  --border: #e5e7eb;
+  --border-input: #d1d5db;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-placeholder: #9ca3af;
+  --btn-primary: #111827;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #1f2937;
+  --btn-secondary-text: #374151;
+  --btn-secondary-border: #d1d5db;
+  --btn-secondary-hover: #f3f4f6;
+  --btn-destructive-bg: #dc2626;
+  --btn-destructive-text: #ffffff;
+  --btn-destructive-hover: #b91c1c;
+  --toggle-bg: #d1d5db;
+  --toggle-active: #111827;
+  --toggle-dot: #ffffff;
+}
+
+.dark {
+  --page: #0a0a0a;
+  --surface: #1a1a1a;
+  --input: #1a1a1a;
+  --border: #2e2e2e;
+  --border-input: #404040;
+  --text-primary: #f5f5f5;
+  --text-secondary: #a3a3a3;
+  --text-placeholder: #525252;
+  --btn-primary: #f5f5f5;
+  --btn-primary-text: #0a0a0a;
+  --btn-primary-hover: #e5e5e5;
+  --btn-secondary-text: #a3a3a3;
+  --btn-secondary-border: #404040;
+  --btn-secondary-hover: #262626;
+  --btn-destructive-bg: #ef4444;
+  --btn-destructive-text: #ffffff;
+  --btn-destructive-hover: #dc2626;
+  --toggle-bg: #404040;
+  --toggle-active: #f5f5f5;
+  --toggle-dot: #ffffff;
+}

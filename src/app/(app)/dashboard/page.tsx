@@ -25,24 +25,24 @@ export default async function DashboardPage() {
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-text-primary">
             Welcome, {email}
           </h1>
         </div>
         <Link
           href="/forms/new"
-          className="w-full rounded-lg bg-blue-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-700 sm:w-auto"
+          className="w-full rounded-lg bg-btn-primary px-4 py-2 text-center text-sm font-medium text-btn-primary-text hover:bg-btn-primary-hover sm:w-auto"
         >
           + New form
         </Link>
       </div>
 
       {forms.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 py-20 dark:border-gray-600">
-          <p className="text-lg text-gray-500 dark:text-gray-400">
+        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border-input py-20">
+          <p className="text-lg text-text-secondary">
             No forms yet
           </p>
-          <p className="mt-1 text-sm text-gray-400 dark:text-gray-500">
+          <p className="mt-1 text-sm text-text-placeholder">
             Create your first form to get started
           </p>
         </div>
@@ -52,12 +52,12 @@ export default async function DashboardPage() {
             <Link
               key={form.id}
               href={`/forms/${form.id}`}
-              className="group block min-w-0 rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+              className="group block min-w-0 rounded-xl border border-border bg-surface p-6 shadow-sm transition hover:shadow-md"
             >
-              <h3 className="truncate text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="truncate text-lg font-semibold text-text-primary">
                 {form.title}
               </h3>
-              <p className="mt-1 line-clamp-2 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 line-clamp-2 text-sm text-text-secondary">
                 {form.description}
               </p>
               <div className="mt-4 flex items-center justify-between">
@@ -70,7 +70,7 @@ export default async function DashboardPage() {
                 >
                   {form.is_published ? "Published" : "Draft"}
                 </span>
-                <span className="text-xs text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-text-placeholder">
                   Updated {formatDate(form.updated_at)}
                 </span>
               </div>
