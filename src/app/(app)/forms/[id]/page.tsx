@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -8,7 +8,7 @@ import { QuestionCard } from "@/components/QuestionCard";
 import { FormPreview } from "@/components/FormPreview";
 import { AiPromptBar } from "@/components/AiPromptBar";
 import { ApiError } from "@/lib/api";
-import { createFormClient } from "@/lib/form";
+import { getFormClient, updateFormClient } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
 
 function EditableField({
@@ -105,7 +105,12 @@ const MOCK_QUESTIONS: FormQuestion[] = [
   },
 ];
 
-export default function NewFormPage() {
+export default function EditFormPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
   const router = useRouter();
   const { data: session } = useSession();
   const idCounter = useRef(0);
@@ -122,16 +127,39 @@ export default function NewFormPage() {
     };
   }
 
-  const [title, setTitle] = useState("Untitled Form");
+  const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [prompt, setPrompt] = useState("");
-  const [questions, setQuestions] = useState<FormQuestion[]>([
-    createBlankQuestion(),
-  ]);
+  const [questions, setQuestions] = useState<FormQuestion[]>([]);
   const [isPublished, setIsPublished] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!session?.accessToken) return;
+
+    getFormClient(session.accessToken, id)
+      .then((res) => {
+        const data = res.data;
+        setTitle(data.title);
+        setDescription(data.description ?? "");
+        setQuestions(data.questions ?? []);
+        setIsPublished(data.is_published);
+
+        if (data.questions && data.questions.length > 0) {
+          idCounter.current = Math.max(
+            ...data.questions.map((q) => parseInt(q.id, 10)),
+          );
+        }
+      })
+      .catch((err) => {
+        setLoadError(err instanceof ApiError ? err.message : "Failed to load form");
+      })
+      .finally(() => setLoading(false));
+  }, [session, id]);
 
   function handleQuestionChange(index: number, updated: FormQuestion) {
     setQuestions((prev) => {
@@ -163,16 +191,15 @@ export default function NewFormPage() {
     setSaving(true);
     setSaveError(null);
 
-    const hasQuestions = questions.some((q) => q.text.trim());
-
     try {
       if (!session?.accessToken) {
         throw new Error("Not authenticated");
       }
-      await createFormClient(session.accessToken, {
+      await updateFormClient(session.accessToken, id, {
         title,
-        description: description || "No description",
-        questions: hasQuestions ? questions : null,
+        description: description || null,
+        questions: questions.length > 0 ? questions : null,
+        is_published: isPublished,
       });
       router.push("/dashboard");
     } catch (err) {
@@ -180,6 +207,25 @@ export default function NewFormPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-1 items-center justify-center bg-page">
+        <p className="text-sm text-text-secondary">Loading...</p>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-page">
+        <p className="text-sm text-red-500">{loadError}</p>
+        <Link href="/dashboard" className="text-sm text-text-secondary hover:text-text-primary">
+          &larr; Back to dashboard
+        </Link>
+      </div>
+    );
   }
 
   return (

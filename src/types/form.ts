@@ -23,6 +23,13 @@ export interface FormCreateRequest {
   questions?: FormQuestion[] | null;
 }
 
+export interface FormUpdateRequest {
+  title?: string | null;
+  description?: string | null;
+  questions?: FormQuestion[] | null;
+  is_published?: boolean | null;
+}
+
 export interface FormResponseData {
   id: string;
   title: string;
