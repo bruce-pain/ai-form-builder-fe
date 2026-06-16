@@ -52,3 +52,30 @@ export interface FormListResponse {
   message: string;
   data: FormListResponseData[];
 }
+
+export interface ResponseAnswer {
+  question_id: string;
+  answer_type: "text" | "select";
+  text_answer: string | null;
+  select_answer: string[] | null;
+}
+
+export interface FormPublicResponseData {
+  id: string;
+  title: string;
+  description: string;
+  questions: FormQuestion[] | null;
+  is_published: boolean;
+}
+
+export interface FormPublicResponse {
+  status_code: number;
+  message: string;
+  data: FormPublicResponseData;
+}
+
+export interface FormSubmitResponse {
+  status_code: number;
+  message: string;
+  data: Record<string, never>;
+}

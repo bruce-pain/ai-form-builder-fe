@@ -9,7 +9,8 @@ export default auth((req: any) => {
   const isPublicPage =
     pathname === "/" ||
     pathname.startsWith("/login") ||
-    pathname.startsWith("/register");
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/forms/public/");
   const isApiAuth = pathname.startsWith("/api/auth");
 
   if (isPublicPage) {

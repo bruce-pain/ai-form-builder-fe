@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getForms } from "@/lib/form";
+import { ShareButton } from "@/components/ShareButton";
 
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat("en-US", {
@@ -61,15 +62,18 @@ export default async function DashboardPage() {
                 {form.description}
               </p>
               <div className="mt-4 flex items-center justify-between">
-                <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                    form.is_published
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                      : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-                  }`}
-                >
-                  {form.is_published ? "Published" : "Draft"}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      form.is_published
+                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                        : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                    }`}
+                  >
+                    {form.is_published ? "Published" : "Draft"}
+                  </span>
+                  <ShareButton formId={form.id} />
+                </div>
                 <span className="text-xs text-text-placeholder">
                   Updated {formatDate(form.updated_at)}
                 </span>
