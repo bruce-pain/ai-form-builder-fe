@@ -128,7 +128,6 @@ export default function NewFormPage() {
   const [questions, setQuestions] = useState<FormQuestion[]>([
     createBlankQuestion(),
   ]);
-  const [isPublished, setIsPublished] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -232,17 +231,6 @@ export default function NewFormPage() {
               />
             </div>
           )}
-          <div
-            onClick={() => setIsPublished(!isPublished)}
-            className="flex cursor-pointer items-center gap-1.5 text-sm text-text-secondary"
-          >
-            <span
-              className={`h-2 w-2 rounded-full ${
-                isPublished ? "bg-white" : "bg-gray-600"
-              }`}
-            />
-            Status: {isPublished ? "Published" : "Draft"}
-          </div>
 
           {isPreview ? (
             <FormPreview

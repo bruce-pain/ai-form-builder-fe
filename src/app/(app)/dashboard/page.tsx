@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getForms } from "@/lib/form";
 import { ShareButton } from "@/components/ShareButton";
+import { FormCardMenu } from "@/components/FormCardMenu";
 
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat("en-US", {
@@ -53,8 +54,12 @@ export default async function DashboardPage() {
             <Link
               key={form.id}
               href={`/forms/${form.id}`}
-              className="group block min-w-0 rounded-xl border border-border bg-surface p-6 shadow-sm transition hover:shadow-md"
+              className="group relative block min-w-0 rounded-xl border border-border bg-surface p-6 shadow-sm transition hover:shadow-md"
             >
+              <FormCardMenu
+                formId={form.id}
+                isPublished={form.is_published}
+              />
               <h3 className="truncate text-lg font-semibold text-text-primary">
                 {form.title}
               </h3>
@@ -72,7 +77,7 @@ export default async function DashboardPage() {
                   >
                     {form.is_published ? "Published" : "Draft"}
                   </span>
-                  <ShareButton formId={form.id} />
+                  {form.is_published && <ShareButton formId={form.id} />}
                 </div>
                 <span className="text-xs text-text-placeholder">
                   Updated {formatDate(form.updated_at)}

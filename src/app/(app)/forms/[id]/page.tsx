@@ -148,6 +148,9 @@ export default function EditFormPage({
         setDescription(data.description ?? "");
         setQuestions(data.questions ?? []);
         setIsPublished(data.is_published);
+        if (data.is_published) {
+          setIsPreview(true);
+        }
 
         if (data.questions && data.questions.length > 0) {
           idCounter.current = Math.max(
@@ -209,6 +212,8 @@ export default function EditFormPage({
     }
   }
 
+  const isReadOnly = isPublished;
+
   if (loading) {
     return (
       <div className="flex flex-1 items-center justify-center bg-page">
@@ -237,60 +242,35 @@ export default function EditFormPage({
         >
           &larr; Back to dashboard
         </Link>
-        <div className="flex items-center gap-3">
-          {saveError && (
-            <span className="text-sm text-red-500">{saveError}</span>
-          )}
-          <button
-            onClick={() => setIsPreview(!isPreview)}
-            className="rounded-lg border border-btn-secondary-border px-4 py-1.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
-          >
-            {isPreview ? "Edit" : "Preview"}
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="rounded-lg border border-btn-secondary-border px-4 py-1.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save"}
-          </button>
-        </div>
+        {isReadOnly ? (
+          <span className="text-xs font-medium text-green-600 dark:text-green-400">
+            Published
+          </span>
+        ) : (
+          <div className="flex items-center gap-3">
+            {saveError && (
+              <span className="text-sm text-red-500">{saveError}</span>
+            )}
+            <button
+              onClick={() => setIsPreview(!isPreview)}
+              className="rounded-lg border border-btn-secondary-border px-4 py-1.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
+            >
+              {isPreview ? "Edit" : "Preview"}
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="rounded-lg border border-btn-secondary-border px-4 py-1.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {saving ? "Saving..." : "Save"}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8">
         <div className="mx-auto max-w-2xl space-y-6">
-          {!isPreview && (
-            <div className="space-y-3">
-              <EditableField
-                value={title}
-                onChange={setTitle}
-                className="text-2xl font-bold text-text-primary"
-                inputClassName="w-full text-2xl font-bold text-text-primary bg-transparent border-b-2 border-border-input focus:outline-none py-0.5"
-                placeholder="Form title"
-              />
-              <EditableField
-                value={description}
-                onChange={setDescription}
-                isTextarea
-                className="w-full text-sm text-text-secondary"
-                inputClassName="w-full text-sm text-text-secondary bg-transparent border-b-2 border-border-input focus:outline-none resize-none py-0.5"
-                placeholder="Form description (optional)"
-              />
-            </div>
-          )}
-          <div
-            onClick={() => setIsPublished(!isPublished)}
-            className="flex cursor-pointer items-center gap-1.5 text-sm text-text-secondary"
-          >
-            <span
-              className={`h-2 w-2 rounded-full ${
-                isPublished ? "bg-white" : "bg-gray-600"
-              }`}
-            />
-            Status: {isPublished ? "Published" : "Draft"}
-          </div>
-
-          {isPreview ? (
+          {isReadOnly ? (
             <FormPreview
               questions={questions}
               title={title}
@@ -298,43 +278,72 @@ export default function EditFormPage({
             />
           ) : (
             <>
-              <div className="space-y-4">
-                {questions.map((question, index) => (
-                  <QuestionCard
-                    key={question.id}
-                    question={question}
-                    onChange={(updated) => handleQuestionChange(index, updated)}
-                    onDelete={() => handleDelete(index)}
+              {!isPreview && (
+                <div className="space-y-3">
+                  <EditableField
+                    value={title}
+                    onChange={setTitle}
+                    className="text-2xl font-bold text-text-primary"
+                    inputClassName="w-full text-2xl font-bold text-text-primary bg-transparent border-b-2 border-border-input focus:outline-none py-0.5"
+                    placeholder="Form title"
                   />
-                ))}
-              </div>
+                  <EditableField
+                    value={description}
+                    onChange={setDescription}
+                    isTextarea
+                    className="w-full text-sm text-text-secondary"
+                    inputClassName="w-full text-sm text-text-secondary bg-transparent border-b-2 border-border-input focus:outline-none resize-none py-0.5"
+                    placeholder="Form description (optional)"
+                  />
+                </div>
+              )}
+              {isPreview ? (
+                <FormPreview
+                  questions={questions}
+                  title={title}
+                  description={description}
+                />
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    {questions.map((question, index) => (
+                      <QuestionCard
+                        key={question.id}
+                        question={question}
+                        onChange={(updated) => handleQuestionChange(index, updated)}
+                        onDelete={() => handleDelete(index)}
+                      />
+                    ))}
+                  </div>
 
-              <button
-                onClick={handleAdd}
-                className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                Add question
-              </button>
+                  <button
+                    onClick={handleAdd}
+                    className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Add question
+                  </button>
+                </>
+              )}
             </>
           )}
         </div>
       </div>
 
-      {!isPreview && (
+      {!isPreview && !isReadOnly && (
         <AiPromptBar value={prompt} onChange={setPrompt} onSubmit={handleAiSubmit} />
       )}
     </div>
