@@ -6,14 +6,11 @@ export default auth((req: any) => {
   const { pathname } = (req as NextRequest).nextUrl;
   const isLoggedIn = !!req.auth;
 
-  const isPublicPage =
-    pathname === "/" ||
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/register") ||
-    pathname.startsWith("/forms/public/");
+  const isAuthPage =
+    pathname.startsWith("/login") || pathname.startsWith("/register");
   const isApiAuth = pathname.startsWith("/api/auth");
 
-  if (isPublicPage) {
+  if (isAuthPage) {
     if (isLoggedIn) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
