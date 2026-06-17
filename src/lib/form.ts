@@ -1,4 +1,4 @@
-import { apiFetch, clientFetch, publicFetch } from "@/lib/api";
+import { apiFetch, clientFetch, publicFetch, ApiError } from "@/lib/api";
 import type { FormCreateRequest, FormListResponse, FormPublicResponse, FormResponse, FormSubmitResponse, FormUpdateRequest, ResponseAnswer } from "@/types/form";
 
 export async function getForms(): Promise<FormListResponse> {
@@ -32,6 +32,25 @@ export async function updateFormClient(token: string, id: string, data: FormUpda
 
 export async function getPublicForm(id: string): Promise<FormPublicResponse> {
   return publicFetch(`/api/v1/forms/public/${id}`);
+}
+
+export async function deleteFormClient(token: string, id: string): Promise<void> {
+  const headers = new Headers();
+  headers.set("Authorization", `Bearer ${token}`);
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/forms/${id}`, {
+    method: "DELETE",
+    headers,
+  });
+
+  if (!res.ok) {
+    let message = `Request failed with status ${res.status}`;
+    try {
+      const error = await res.json();
+      if (error.detail) message = error.detail;
+    } catch {}
+    throw new ApiError(res.status, message);
+  }
 }
 
 export async function submitFormResponse(formId: string, answers: ResponseAnswer[]): Promise<FormSubmitResponse> {

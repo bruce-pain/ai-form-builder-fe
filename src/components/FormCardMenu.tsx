@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { updateFormClient } from "@/lib/form";
+import { updateFormClient, deleteFormClient } from "@/lib/form";
 import { ApiError } from "@/lib/api";
 
 export function FormCardMenu({
@@ -17,6 +17,7 @@ export function FormCardMenu({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,6 +33,11 @@ export function FormCardMenu({
 
   async function handleToggle() {
     if (toggling || !session?.accessToken) return;
+    if (
+      !window.confirm(
+        `Are you sure you want to ${isPublished ? "unpublish" : "publish"} this form?`,
+      )
+    ) return;
     setToggling(true);
     try {
       await updateFormClient(session.accessToken, formId, {
@@ -44,6 +50,23 @@ export function FormCardMenu({
       );
     } finally {
       setToggling(false);
+      setOpen(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (deleting || !session?.accessToken) return;
+    if (!window.confirm("Are you sure you want to delete this form?")) return;
+    setDeleting(true);
+    try {
+      await deleteFormClient(session.accessToken, formId);
+      router.refresh();
+    } catch (err) {
+      console.error(
+        err instanceof ApiError ? err.message : "Failed to delete form",
+      );
+    } finally {
+      setDeleting(false);
       setOpen(false);
     }
   }
@@ -87,6 +110,18 @@ export function FormCardMenu({
             className="flex w-full items-center px-3 py-1.5 text-left text-sm text-text-secondary hover:bg-btn-secondary-hover disabled:opacity-50"
           >
             {toggling ? "..." : isPublished ? "Unpublish" : "Publish"}
+          </button>
+          <hr className="my-1 border-border" />
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleDelete();
+            }}
+            disabled={deleting}
+            className="flex w-full items-center px-3 py-1.5 text-left text-sm text-red-600 hover:bg-btn-secondary-hover disabled:opacity-50"
+          >
+            {deleting ? "..." : "Delete"}
           </button>
         </div>
       )}
