@@ -79,3 +79,22 @@ export interface FormSubmitResponse {
   message: string;
   data: Record<string, never>;
 }
+
+export interface FormResponseListItem {
+  id: string;
+  answers: ResponseAnswer[];
+  form_id: string;
+  created_at: string;
+}
+
+export interface FormResponseListResponse {
+  status_code: number;
+  message: string;
+  data: FormResponseListItem[];
+}
+
+export interface FormResponseSingleResponse {
+  status_code: number;
+  message: string;
+  data: FormResponseListItem;
+}

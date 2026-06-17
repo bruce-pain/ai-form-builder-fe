@@ -1,5 +1,5 @@
 import { apiFetch, clientFetch, publicFetch, ApiError } from "@/lib/api";
-import type { FormCreateRequest, FormListResponse, FormPublicResponse, FormResponse, FormSubmitResponse, FormUpdateRequest, ResponseAnswer } from "@/types/form";
+import type { FormCreateRequest, FormListResponse, FormPublicResponse, FormResponse, FormResponseListResponse, FormResponseSingleResponse, FormSubmitResponse, FormUpdateRequest, ResponseAnswer } from "@/types/form";
 
 export async function getForms(): Promise<FormListResponse> {
   return apiFetch("/api/v1/forms");
@@ -58,4 +58,12 @@ export async function submitFormResponse(formId: string, answers: ResponseAnswer
     method: "POST",
     body: JSON.stringify({ answers }),
   });
+}
+
+export async function getFormResponsesClient(token: string, formId: string): Promise<FormResponseListResponse> {
+  return clientFetch(`/api/v1/forms/${formId}/responses`, token);
+}
+
+export async function getFormResponseClient(token: string, formId: string, responseId: string): Promise<FormResponseSingleResponse> {
+  return clientFetch(`/api/v1/forms/${formId}/responses/${responseId}`, token);
 }
