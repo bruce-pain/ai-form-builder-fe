@@ -98,3 +98,17 @@ export interface FormResponseSingleResponse {
   message: string;
   data: FormResponseListItem;
 }
+
+export interface LLMRequest {
+  prompt: string;
+}
+
+export interface LLMResponse {
+  status_code: number;
+  message: string;
+  data: FormQuestionList;
+}
+
+export interface FormQuestionList {
+  questions: FormQuestion[];
+}

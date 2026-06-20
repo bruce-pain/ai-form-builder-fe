@@ -8,7 +8,7 @@ import { QuestionCard } from "@/components/QuestionCard";
 import { FormPreview } from "@/components/FormPreview";
 import { AiPromptBar } from "@/components/AiPromptBar";
 import { ApiError } from "@/lib/api";
-import { getFormClient, updateFormClient } from "@/lib/form";
+import { getFormClient, updateFormClient, generateQuestionsClient } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
 
 function EditableField({
@@ -78,33 +78,6 @@ function EditableField({
   );
 }
 
-const MOCK_QUESTIONS: FormQuestion[] = [
-  {
-    id: "1",
-    text: "What is your full name?",
-    answer_type: "text",
-    answer_select_options: null,
-    answer_select_multiple: null,
-    required: true,
-  },
-  {
-    id: "2",
-    text: "How did you hear about us?",
-    answer_type: "select",
-    answer_select_options: ["Social Media", "Friend", "Search Engine", "Other"],
-    answer_select_multiple: false,
-    required: true,
-  },
-  {
-    id: "3",
-    text: "Which features interest you?",
-    answer_type: "select",
-    answer_select_options: ["Pricing", "Integrations", "Support", "Mobile App"],
-    answer_select_multiple: true,
-    required: false,
-  },
-];
-
 export default function EditFormPage({
   params,
 }: {
@@ -137,6 +110,7 @@ export default function EditFormPage({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [aiGenerating, setAiGenerating] = useState(false);
 
   useEffect(() => {
     if (!session?.accessToken) return;
@@ -181,12 +155,22 @@ export default function EditFormPage({
     setQuestions((prev) => [...prev, createBlankQuestion()]);
   }
 
-  function handleAiSubmit(e: React.FormEvent) {
+  async function handleAiSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!prompt.trim()) return;
+    if (!prompt.trim() || aiGenerating) return;
 
-    setQuestions(MOCK_QUESTIONS);
-    setPrompt("");
+    if (!session?.accessToken) return;
+
+    setAiGenerating(true);
+    try {
+      const res = await generateQuestionsClient(session.accessToken, prompt);
+      setQuestions(res.data.questions);
+      setPrompt("");
+    } catch {
+      setSaveError("Failed to generate questions");
+    } finally {
+      setAiGenerating(false);
+    }
   }
 
   async function handleSave() {
@@ -344,7 +328,7 @@ export default function EditFormPage({
       </div>
 
       {!isPreview && !isReadOnly && (
-        <AiPromptBar value={prompt} onChange={setPrompt} onSubmit={handleAiSubmit} />
+        <AiPromptBar value={prompt} onChange={setPrompt} onSubmit={handleAiSubmit} loading={aiGenerating} />
       )}
     </div>
   );
