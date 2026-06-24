@@ -105,6 +105,7 @@ export default function NewFormPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [aiGenerating, setAiGenerating] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
 
   function handleQuestionChange(index: number, updated: FormQuestion) {
     setQuestions((prev) => {
@@ -131,8 +132,14 @@ export default function NewFormPage() {
 
     setAiGenerating(true);
     try {
-      const res = await generateQuestionsClient(session.accessToken, prompt);
+      const res = await generateQuestionsClient(
+        session.accessToken,
+        prompt,
+        conversationId,
+        { questions: questions.filter(q => q.text.trim()) },
+      );
       setQuestions(res.data.questions);
+      setConversationId(res.conversation_id ?? null);
       setPrompt("");
     } catch {
       setSaveError("Failed to generate questions");

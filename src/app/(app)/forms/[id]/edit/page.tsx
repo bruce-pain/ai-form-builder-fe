@@ -111,6 +111,7 @@ export default function EditFormPage({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [aiGenerating, setAiGenerating] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!session?.accessToken) return;
@@ -163,8 +164,14 @@ export default function EditFormPage({
 
     setAiGenerating(true);
     try {
-      const res = await generateQuestionsClient(session.accessToken, prompt);
+      const res = await generateQuestionsClient(
+        session.accessToken,
+        prompt,
+        conversationId,
+        { questions: questions.filter(q => q.text.trim()) },
+      );
       setQuestions(res.data.questions);
+      setConversationId(res.conversation_id ?? null);
       setPrompt("");
     } catch {
       setSaveError("Failed to generate questions");

@@ -13,9 +13,17 @@ export default function Home() {
       </h1>
 
       {session ? (
-        <p className="text-text-primary">
-          Welcome, {session.user?.email ?? "user"}
-        </p>
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-text-primary">
+            Welcome, {session.user?.email ?? "user"}
+          </p>
+          <Link
+            href="/dashboard"
+            className="rounded-lg bg-btn-primary px-6 py-3 text-base font-medium text-btn-primary-text hover:bg-btn-primary-hover"
+          >
+            Go to Dashboard
+          </Link>
+        </div>
       ) : (
         <div className="flex gap-4">
           <Link
