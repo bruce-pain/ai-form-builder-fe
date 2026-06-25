@@ -10,6 +10,7 @@ import { AiPromptBar } from "@/components/AiPromptBar";
 import { ApiError } from "@/lib/api";
 import { getFormClient, updateFormClient, generateQuestionsClient } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
+import { buildEditsSummary } from "@/lib/editTracker";
 
 function EditableField({
   value,
@@ -87,6 +88,7 @@ export default function EditFormPage({
   const router = useRouter();
   const { data: session } = useSession();
   const idCounter = useRef(0);
+  const prevQuestionsRef = useRef<FormQuestion[]>([]);
 
   function createBlankQuestion(): FormQuestion {
     idCounter.current += 1;
@@ -129,6 +131,10 @@ export default function EditFormPage({
 
         setConversationId(data.conversation_id);
 
+        if (data.conversation_id) {
+          prevQuestionsRef.current = JSON.parse(JSON.stringify(data.questions ?? []));
+        }
+
         if (data.questions && data.questions.length > 0) {
           idCounter.current = Math.max(
             ...data.questions.map((q) => parseInt(q.id, 10)),
@@ -158,7 +164,7 @@ export default function EditFormPage({
     setQuestions((prev) => [...prev, createBlankQuestion()]);
   }
 
-  async function handleAiSubmit(e: React.FormEvent) {
+  async function handleAiSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!prompt.trim() || aiGenerating) return;
 
@@ -166,14 +172,18 @@ export default function EditFormPage({
 
     setAiGenerating(true);
     try {
+      const editsSummary = buildEditsSummary(prevQuestionsRef.current, questions);
+      const fullPrompt = editsSummary ? editsSummary + "\n" + prompt : prompt;
+
       const res = await generateQuestionsClient(
         session.accessToken,
-        prompt,
+        fullPrompt,
         conversationId,
         { questions: questions.filter(q => q.text.trim()) },
       );
       setQuestions(res.data.questions);
       setConversationId(res.conversation_id ?? null);
+      prevQuestionsRef.current = JSON.parse(JSON.stringify(res.data.questions));
       setPrompt("");
     } catch {
       setSaveError("Failed to generate questions");

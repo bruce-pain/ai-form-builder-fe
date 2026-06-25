@@ -3,7 +3,7 @@
 interface AiPromptBarProps {
   value: string;
   onChange: (v: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void;
   loading?: boolean;
 }
 

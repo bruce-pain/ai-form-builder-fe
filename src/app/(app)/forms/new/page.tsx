@@ -10,6 +10,7 @@ import { AiPromptBar } from "@/components/AiPromptBar";
 import { ApiError } from "@/lib/api";
 import { createFormClient, generateQuestionsClient } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
+import { buildEditsSummary } from "@/lib/editTracker";
 
 function EditableField({
   value,
@@ -106,6 +107,7 @@ export default function NewFormPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const prevQuestionsRef = useRef<FormQuestion[]>([]);
 
   function handleQuestionChange(index: number, updated: FormQuestion) {
     setQuestions((prev) => {
@@ -124,7 +126,7 @@ export default function NewFormPage() {
     setQuestions((prev) => [...prev, createBlankQuestion()]);
   }
 
-  async function handleAiSubmit(e: React.FormEvent) {
+  async function handleAiSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!prompt.trim() || aiGenerating) return;
 
@@ -132,14 +134,18 @@ export default function NewFormPage() {
 
     setAiGenerating(true);
     try {
+      const editsSummary = buildEditsSummary(prevQuestionsRef.current, questions);
+      const fullPrompt = editsSummary ? editsSummary + "\n" + prompt : prompt;
+
       const res = await generateQuestionsClient(
         session.accessToken,
-        prompt,
+        fullPrompt,
         conversationId,
         { questions: questions.filter(q => q.text.trim()) },
       );
       setQuestions(res.data.questions);
       setConversationId(res.conversation_id ?? null);
+      prevQuestionsRef.current = JSON.parse(JSON.stringify(res.data.questions));
       setPrompt("");
     } catch {
       setSaveError("Failed to generate questions");
