@@ -1,5 +1,5 @@
 import { apiFetch, clientFetch, publicFetch, ApiError } from "@/lib/api";
-import type { FormCreateRequest, FormListResponse, FormPublicResponse, FormQuestionList, FormResponse, FormResponseListResponse, FormResponseSingleResponse, FormSubmitResponse, FormUpdateRequest, LLMResponse, ResponseAnswer } from "@/types/form";
+import type { FormCreateRequest, FormListResponse, FormPublicResponse, LLMFormData, FormResponse, FormResponseListResponse, FormResponseSingleResponse, FormSubmitResponse, FormUpdateRequest, LLMResponse, ResponseAnswer } from "@/types/form";
 
 export async function getForms(): Promise<FormListResponse> {
   return apiFetch("/api/v1/forms");
@@ -72,7 +72,7 @@ export async function generateQuestionsClient(
   token: string,
   prompt: string,
   conversationId?: string | null,
-  currentState?: FormQuestionList | null,
+  currentState?: LLMFormData | null,
 ): Promise<LLMResponse> {
   return clientFetch("/api/v1/llm", token, {
     method: "POST",

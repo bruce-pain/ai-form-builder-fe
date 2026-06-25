@@ -101,16 +101,22 @@ export interface FormResponseSingleResponse {
   data: FormResponseListItem;
 }
 
+export interface LLMFormData {
+  title?: string | null;
+  description?: string | null;
+  questions: FormQuestion[];
+}
+
 export interface LLMRequest {
   prompt: string;
   conversation_id?: string | null;
-  current_state?: FormQuestionList | null;
+  current_state?: LLMFormData | null;
 }
 
 export interface LLMResponse {
   status_code: number;
   message: string;
-  data: FormQuestionList;
+  data: LLMFormData;
   conversation_id: string;
 }
 

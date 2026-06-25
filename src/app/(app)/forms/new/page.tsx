@@ -10,7 +10,7 @@ import { AiPromptBar } from "@/components/AiPromptBar";
 import { ApiError } from "@/lib/api";
 import { createFormClient, generateQuestionsClient } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
-import { buildEditsSummary } from "@/lib/editTracker";
+import { buildEditsSummary, type FormSnapshot } from "@/lib/editTracker";
 
 function EditableField({
   value,
@@ -107,7 +107,7 @@ export default function NewFormPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const prevQuestionsRef = useRef<FormQuestion[]>([]);
+  const prevFormSnapshotRef = useRef<FormSnapshot>({ title: "", description: "", questions: [] });
 
   function handleQuestionChange(index: number, updated: FormQuestion) {
     setQuestions((prev) => {
@@ -134,18 +134,33 @@ export default function NewFormPage() {
 
     setAiGenerating(true);
     try {
-      const editsSummary = buildEditsSummary(prevQuestionsRef.current, questions);
+      const currentSnapshot: FormSnapshot = {
+        title,
+        description,
+        questions,
+      };
+      const editsSummary = buildEditsSummary(prevFormSnapshotRef.current, currentSnapshot);
       const fullPrompt = editsSummary ? editsSummary + "\n" + prompt : prompt;
 
       const res = await generateQuestionsClient(
         session.accessToken,
         fullPrompt,
         conversationId,
-        { questions: questions.filter(q => q.text.trim()) },
+        {
+          title: title || null,
+          description: description || null,
+          questions: questions.filter(q => q.text.trim()),
+        },
       );
       setQuestions(res.data.questions);
+      if (res.data.title !== undefined) setTitle(res.data.title ?? "");
+      if (res.data.description !== undefined) setDescription(res.data.description ?? "");
       setConversationId(res.conversation_id ?? null);
-      prevQuestionsRef.current = JSON.parse(JSON.stringify(res.data.questions));
+      prevFormSnapshotRef.current = {
+        title: res.data.title ?? "",
+        description: res.data.description ?? "",
+        questions: JSON.parse(JSON.stringify(res.data.questions)),
+      };
       setPrompt("");
     } catch {
       setSaveError("Failed to generate questions");

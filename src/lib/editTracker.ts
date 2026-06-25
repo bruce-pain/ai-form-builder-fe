@@ -1,5 +1,11 @@
 import type { FormQuestion } from "@/types/form";
 
+export interface FormSnapshot {
+  title: string;
+  description: string;
+  questions: FormQuestion[];
+}
+
 function diffQuestion(before: FormQuestion, after: FormQuestion): string[] {
   const edits: string[] = [];
   const label = after.text.trim() || before.text.trim() || "a question";
@@ -46,31 +52,43 @@ function diffQuestion(before: FormQuestion, after: FormQuestion): string[] {
 }
 
 export function buildEditsSummary(
-  before: FormQuestion[],
-  after: FormQuestion[],
+  before: FormSnapshot,
+  after: FormSnapshot,
 ): string {
-  if (before.length === 0) return "";
+  if (before.questions.length === 0) return "";
 
   const edits: string[] = [];
 
-  for (const bq of before) {
-    const aq = after.find((q) => q.id === bq.id);
+  if (before.title !== after.title) {
+    const old = before.title || "empty";
+    const neu = after.title || "empty";
+    edits.push(`[User changed title from "${old}" to "${neu}"]`);
+  }
+
+  if (before.description !== after.description) {
+    const old = before.description || "empty";
+    const neu = after.description || "empty";
+    edits.push(`[User changed description from "${old}" to "${neu}"]`);
+  }
+
+  for (const bq of before.questions) {
+    const aq = after.questions.find((q) => q.id === bq.id);
     if (!aq) {
       const label = bq.text.trim() || "a question";
       edits.push(`[User deleted: "${label}"]`);
     }
   }
 
-  for (const aq of after) {
-    const bq = before.find((q) => q.id === aq.id);
+  for (const aq of after.questions) {
+    const bq = before.questions.find((q) => q.id === aq.id);
     if (!bq) {
       const label = aq.text.trim() || "a question";
       edits.push(`[User added: "${label}"]`);
     }
   }
 
-  for (const aq of after) {
-    const bq = before.find((q) => q.id === aq.id);
+  for (const aq of after.questions) {
+    const bq = before.questions.find((q) => q.id === aq.id);
     if (bq) {
       edits.push(...diffQuestion(bq, aq));
     }
