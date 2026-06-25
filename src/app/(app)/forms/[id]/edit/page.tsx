@@ -127,6 +127,8 @@ export default function EditFormPage({
           setIsPreview(true);
         }
 
+        setConversationId(data.conversation_id);
+
         if (data.questions && data.questions.length > 0) {
           idCounter.current = Math.max(
             ...data.questions.map((q) => parseInt(q.id, 10)),

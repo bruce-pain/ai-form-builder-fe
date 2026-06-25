@@ -21,6 +21,7 @@ export interface FormCreateRequest {
   title: string;
   description: string;
   questions?: FormQuestion[] | null;
+  conversation_id?: string | null;
 }
 
 export interface FormUpdateRequest {
@@ -36,6 +37,7 @@ export interface FormResponseData {
   description: string;
   questions: FormQuestion[] | null;
   is_published: boolean;
+  conversation_id: string | null;
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -109,7 +111,7 @@ export interface LLMResponse {
   status_code: number;
   message: string;
   data: FormQuestionList;
-  conversation_id?: string;
+  conversation_id: string;
 }
 
 export interface FormQuestionList {

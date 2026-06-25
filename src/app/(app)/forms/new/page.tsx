@@ -163,6 +163,7 @@ export default function NewFormPage() {
         title,
         description: description || "No description",
         questions: hasQuestions ? questions : null,
+        conversation_id: conversationId,
       });
       router.push("/dashboard");
     } catch (err) {
