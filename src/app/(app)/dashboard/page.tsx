@@ -53,7 +53,7 @@ export default async function DashboardPage() {
           {forms.map((form) => (
             <Link
               key={form.id}
-              href={`/forms/${form.id}`}
+              href={form.is_published ? `/forms/${form.id}` : `/forms/${form.id}/edit`}
               className="group relative block min-w-0 rounded-xl border border-border bg-surface p-6 shadow-sm transition hover:shadow-md"
             >
               <FormCardMenu

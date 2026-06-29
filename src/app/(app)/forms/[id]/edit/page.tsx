@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { QuestionCard } from "@/components/QuestionCard";
 import { FormPreview } from "@/components/FormPreview";
 import { AiPromptBar } from "@/components/AiPromptBar";
+import { Toast } from "@/components/Toast";
 import { ApiError } from "@/lib/api";
 import { getFormClient, updateFormClient, generateQuestionsClient } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
@@ -271,7 +272,7 @@ export default function EditFormPage({
         ) : (
           <div className="flex items-center gap-3">
             {saveError && (
-              <span className="text-sm text-red-500">{saveError}</span>
+              <Toast message={saveError} onDismiss={() => setSaveError(null)} />
             )}
             <button
               onClick={() => setIsPreview(!isPreview)}

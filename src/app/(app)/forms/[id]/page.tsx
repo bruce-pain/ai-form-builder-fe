@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { ApiError } from "@/lib/api";
-import { getFormClient, updateFormClient, deleteFormClient } from "@/lib/form";
+import { getFormClient, deleteFormClient } from "@/lib/form";
 
 export default function FormDetailPage({
   params,
@@ -20,7 +20,6 @@ export default function FormDetailPage({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [isPublished, setIsPublished] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -30,9 +29,12 @@ export default function FormDetailPage({
     getFormClient(session.accessToken, id)
       .then((res) => {
         const data = res.data;
+        if (!data.is_published) {
+          router.replace(`/forms/${id}/edit`);
+          return;
+        }
         setTitle(data.title);
         setDescription(data.description ?? "");
-        setIsPublished(data.is_published);
       })
       .catch((err) => {
         setLoadError(
@@ -41,23 +43,6 @@ export default function FormDetailPage({
       })
       .finally(() => setLoading(false));
   }, [session, id]);
-
-  async function handlePublish() {
-    if (actionLoading || !session?.accessToken) return;
-    setActionLoading("publish");
-    try {
-      await updateFormClient(session.accessToken, id, {
-        is_published: true,
-      });
-      setIsPublished(true);
-    } catch (err) {
-      console.error(
-        err instanceof ApiError ? err.message : "Failed to publish form",
-      );
-    } finally {
-      setActionLoading(null);
-    }
-  }
 
   async function handleDelete() {
     if (actionLoading || !session?.accessToken) return;
@@ -123,14 +108,8 @@ export default function FormDetailPage({
         >
           &larr; Back to dashboard
         </Link>
-        <span
-          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-            isPublished
-              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-              : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-          }`}
-        >
-          {isPublished ? "Published" : "Draft"}
+        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+          Published
         </span>
       </div>
 
@@ -144,58 +123,31 @@ export default function FormDetailPage({
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {isPublished ? (
-              <>
-                <Link
-                  href={`/forms/${id}/responses`}
-                  className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
-                >
-                  View Responses
-                </Link>
-                <Link
-                  href={`/forms/public/${id}`}
-                  className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
-                >
-                  Preview
-                </Link>
-                <button
-                  onClick={handleShare}
-                  className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
-                >
-                  {copied ? "Copied!" : "Share"}
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={actionLoading === "delete"}
-                  className="rounded-lg bg-btn-destructive-bg px-4 py-2 text-sm font-medium text-btn-destructive-text hover:bg-btn-destructive-hover disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {actionLoading === "delete" ? "Deleting..." : "Delete"}
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href={`/forms/${id}/edit`}
-                  className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-text hover:bg-btn-primary-hover"
-                >
-                  Edit
-                </Link>
-                <button
-                  onClick={handlePublish}
-                  disabled={actionLoading === "publish"}
-                  className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {actionLoading === "publish" ? "Publishing..." : "Publish"}
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={actionLoading === "delete"}
-                  className="rounded-lg bg-btn-destructive-bg px-4 py-2 text-sm font-medium text-btn-destructive-text hover:bg-btn-destructive-hover disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {actionLoading === "delete" ? "Deleting..." : "Delete"}
-                </button>
-              </>
-            )}
+            <Link
+              href={`/forms/${id}/responses`}
+              className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
+            >
+              View Responses
+            </Link>
+            <Link
+              href={`/forms/public/${id}`}
+              className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
+            >
+              Preview
+            </Link>
+            <button
+              onClick={handleShare}
+              className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
+            >
+              {copied ? "Copied!" : "Share"}
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={actionLoading === "delete"}
+              className="rounded-lg bg-btn-destructive-bg px-4 py-2 text-sm font-medium text-btn-destructive-text hover:bg-btn-destructive-hover disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {actionLoading === "delete" ? "Deleting..." : "Delete"}
+            </button>
           </div>
         </div>
       </div>
