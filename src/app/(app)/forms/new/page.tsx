@@ -9,7 +9,7 @@ import { FormPreview } from "@/components/FormPreview";
 import { AiPromptBar } from "@/components/AiPromptBar";
 import { Toast } from "@/components/Toast";
 import { ApiError } from "@/lib/api";
-import { createFormClient, generateQuestionsClient } from "@/lib/form";
+import { createFormClient, generateQuestionsClient, updateFormClient } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
 import { buildEditsSummary, type FormSnapshot } from "@/lib/editTracker";
 
@@ -108,6 +108,7 @@ export default function NewFormPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [formId, setFormId] = useState<string | null>(null);
   const prevFormSnapshotRef = useRef<FormSnapshot>({ title: "", description: "", questions: [] });
 
   function handleQuestionChange(index: number, updated: FormQuestion) {
@@ -156,7 +157,23 @@ export default function NewFormPage() {
       setQuestions(res.data.questions);
       if (res.data.title !== undefined) setTitle(res.data.title ?? "");
       if (res.data.description !== undefined) setDescription(res.data.description ?? "");
-      setConversationId(res.conversation_id ?? null);
+      const newConversationId = res.conversation_id ?? null;
+      setConversationId(newConversationId);
+      if (newConversationId) {
+        if (!conversationId) {
+          try {
+            const created = await createFormClient(session.accessToken, {
+              title: res.data.title ?? title,
+              description: (res.data.description ?? description) || "No description",
+              questions: res.data.questions.filter(q => q.text.trim()),
+              conversation_id: newConversationId,
+            });
+            setFormId(created.data.id);
+          } catch {
+            // Auto-save failed; formId stays null so it retries next generation
+          }
+        }
+      }
       prevFormSnapshotRef.current = {
         title: res.data.title ?? "",
         description: res.data.description ?? "",
@@ -164,7 +181,7 @@ export default function NewFormPage() {
       };
       setPrompt("");
     } catch {
-      setSaveError("Failed to generate questions");
+      setSaveError("Failed to generate questions. Please try again.");
     } finally {
       setAiGenerating(false);
     }
@@ -181,12 +198,20 @@ export default function NewFormPage() {
       if (!session?.accessToken) {
         throw new Error("Not authenticated");
       }
-      await createFormClient(session.accessToken, {
-        title,
-        description: description || "No description",
-        questions: hasQuestions ? questions : null,
-        conversation_id: conversationId,
-      });
+      if (formId) {
+        await updateFormClient(session.accessToken, formId, {
+          title,
+          description: description || "No description",
+          questions: hasQuestions ? questions : null,
+        });
+      } else {
+        await createFormClient(session.accessToken, {
+          title,
+          description: description || "No description",
+          questions: hasQuestions ? questions : null,
+          conversation_id: conversationId,
+        });
+      }
       router.push("/dashboard");
     } catch (err) {
       setSaveError(err instanceof ApiError ? err.message : "Failed to save form");

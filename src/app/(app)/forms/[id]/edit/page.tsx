@@ -206,7 +206,7 @@ export default function EditFormPage({
       };
       setPrompt("");
     } catch {
-      setSaveError("Failed to generate questions");
+      setSaveError("Failed to generate questions. Please try again.");
     } finally {
       setAiGenerating(false);
     }
