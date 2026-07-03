@@ -11,7 +11,7 @@
 [![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[Frontend](https://github.com/bruce-pain/ai-form-builder-fe) · [Backend](https://github.com/bruce-pain/AI-form-builder)
+[Backend API →](https://github.com/bruce-pain/AI-form-builder-be)
 
 </div>
 
@@ -40,15 +40,15 @@ The frontend is a **Next.js 16** (App Router) application written in **TypeScrip
 
 ## Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| **Next.js 16** (App Router) | React framework with server components and route groups |
-| **React 19** | UI component library |
-| **TypeScript** | Type safety across the entire codebase |
-| **Tailwind CSS v4** | Utility-first CSS with `@theme` custom properties |
-| **next-auth** (v5 beta) | Authentication with JWT credentials provider and auto-refresh |
-| **next-themes** | Dark/light theme switching |
-| **pnpm** | Fast, disk-efficient package manager |
+| Technology                  | Purpose                                                       |
+| --------------------------- | ------------------------------------------------------------- |
+| **Next.js 16** (App Router) | React framework with server components and route groups       |
+| **React 19**                | UI component library                                          |
+| **TypeScript**              | Type safety across the entire codebase                        |
+| **Tailwind CSS v4**         | Utility-first CSS with `@theme` custom properties             |
+| **next-auth** (v5 beta)     | Authentication with JWT credentials provider and auto-refresh |
+| **next-themes**             | Dark/light theme switching                                    |
+| **pnpm**                    | Fast, disk-efficient package manager                          |
 
 ---
 
@@ -58,11 +58,11 @@ The frontend is a **Next.js 16** (App Router) application written in **TypeScrip
 
 Three logical route groups separate concerns:
 
-| Group | Routes | Layout | Access |
-|---|---|---|---|
-| `(app)` | `/dashboard`, `/forms/*` | Header + main content | Authenticated only |
-| `(auth)` | `/login`, `/register` | Minimal (theme toggle) | Redirects to dashboard if logged in |
-| `(public)` | `/forms/public/[id]` | Simple container | No auth required |
+| Group      | Routes                   | Layout                 | Access                              |
+| ---------- | ------------------------ | ---------------------- | ----------------------------------- |
+| `(app)`    | `/dashboard`, `/forms/*` | Header + main content  | Authenticated only                  |
+| `(auth)`   | `/login`, `/register`    | Minimal (theme toggle) | Redirects to dashboard if logged in |
+| `(public)` | `/forms/public/[id]`     | Simple container       | No auth required                    |
 
 ### Dual Fetch Pattern (`src/lib/api.ts`)
 
@@ -153,9 +153,9 @@ pnpm lint       # Run ESLint
 
 ## Related Projects
 
-| Project | Description |
-|---|---|
-| [AI-form-builder](https://github.com/bruce-pain/AI-form-builder) | FastAPI backend with LLM integration, form CRUD, authentication, and response storage |
+| Project                                                          | Description                                                                           |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [AI-form-builder-be](https://github.com/bruce-pain/AI-form-builder-be) | FastAPI backend with LLM integration, form CRUD, authentication, and response storage |
 
 ---
 
