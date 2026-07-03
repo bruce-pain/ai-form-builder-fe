@@ -4,6 +4,8 @@
 
 **Create, publish, and manage forms using natural language prompts powered by AI.**
 
+**Live:** [ai-form-builder-fe.vercel.app](https://ai-form-builder-fe.vercel.app) · [API Docs](https://ai-form-builder-be.onrender.com/v1/docs)
+
 [![Next.js](https://img.shields.io/badge/Next.js_16-000000?logo=next.js&logoColor=white)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React_19-61DAFB?logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
@@ -128,7 +130,7 @@ src/
 
 - **Node.js** >= 18
 - **pnpm**: install via `npm install -g pnpm` or [corepack](https://nodejs.org/api/corepack.html)
-- A running instance of the [AI Form Builder backend](https://github.com/bruce-pain/AI-form-builder)
+- (Optional) A local instance of the [AI Form Builder backend](https://github.com/bruce-pain/AI-form-builder-be) — the app works with the deployed API out of the box
 
 ### Environment Variables
 
@@ -155,7 +157,8 @@ pnpm lint       # Run ESLint
 
 | Project                                                          | Description                                                                           |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| [AI-form-builder-be](https://github.com/bruce-pain/AI-form-builder-be) | FastAPI backend with LLM integration, form CRUD, authentication, and response storage |
+| [AI-form-builder-fe](https://github.com/bruce-pain/ai-form-builder-fe) | Next.js frontend deployed at [ai-form-builder-fe.vercel.app](https://ai-form-builder-fe.vercel.app) |
+| [AI-form-builder-be](https://github.com/bruce-pain/AI-form-builder-be) | FastAPI backend with LLM integration, form CRUD, authentication, and response storage — deployed at [ai-form-builder-be.onrender.com](https://ai-form-builder-be.onrender.com) |
 
 ---
 
