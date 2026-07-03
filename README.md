@@ -1,6 +1,6 @@
 <div align="center">
 
-# AI Form Builder — Frontend
+# AI Form Builder (Frontend)
 
 **Create, publish, and manage forms using natural language prompts powered by AI.**
 
@@ -19,7 +19,7 @@
 
 ## Overview
 
-AI Form Builder is a full-stack application that lets users create forms by simply describing them in plain English. An LLM generates the questions, title, and description automatically, and users can refine the result through natural conversation — no manual drag-and-drop builders needed.
+AI Form Builder is a full-stack application that lets users create forms by simply describing them in plain English. An LLM generates the questions, title, and description automatically, and users can refine the result through natural conversation. No manual drag-and-drop builders needed.
 
 The frontend is a **Next.js 16** (App Router) application written in **TypeScript**, styled with **Tailwind CSS v4**, and authenticated via **next-auth** with JWT. It consumes a FastAPI backend that handles form storage, AI generation, and response collection.
 
@@ -27,14 +27,14 @@ The frontend is a **Next.js 16** (App Router) application written in **TypeScrip
 
 ## Key Features
 
-- **AI-Powered Form Generation** — Describe your form in natural language; the LLM generates questions, title, and description. Supports multi-turn conversational refinement — follow-up prompts modify the existing form contextually.
-- **Smart Edit Tracking** — Manual edits made between AI prompts (title changes, question modifications, additions, deletions) are detected and included in subsequent LLM requests, keeping the AI aware of user changes.
-- **Form CRUD** — Create, preview, edit, publish/unpublish, and delete forms from the dashboard or form detail page.
-- **Multiple Question Types** — Text inputs, single-select (radio), and multi-select (checkbox) with dynamic option management and per-question required toggles.
-- **Public Form Submission** — Published forms get a shareable public link for anonymous responses with client-side validation.
-- **Response Analytics** — View aggregate answer summaries per question or browse individual responses with pagination.
-- **JWT Authentication** — Email/password registration and login with automatic token refresh via next-auth credentials provider.
-- **Dark/Light Theme** — Full theme support via `next-themes` with CSS custom properties and system preference detection.
+- **AI-Powered Form Generation**: Describe your form in natural language; the LLM generates questions, title, and description. Supports multi-turn conversational refinement: follow-up prompts modify the existing form contextually.
+- **Smart Edit Tracking**: Manual edits made between AI prompts (title changes, question modifications, additions, deletions) are detected and included in subsequent LLM requests, keeping the AI aware of user changes.
+- **Form CRUD**: Create, preview, edit, publish/unpublish, and delete forms from the dashboard or form detail page.
+- **Multiple Question Types**: Text inputs, single-select (radio), and multi-select (checkbox) with dynamic option management and per-question required toggles.
+- **Public Form Submission**: Published forms get a shareable public link for anonymous responses with client-side validation.
+- **Response Analytics**: View aggregate answer summaries per question or browse individual responses with pagination.
+- **JWT Authentication**: Email/password registration and login with automatic token refresh via next-auth credentials provider.
+- **Dark/Light Theme**: Full theme support via `next-themes` with CSS custom properties and system preference detection.
 
 ---
 
@@ -66,9 +66,9 @@ Three logical route groups separate concerns:
 
 ### Dual Fetch Pattern (`src/lib/api.ts`)
 
-- **`apiFetch()`** — Server-side authenticated requests (reads auth via `auth()` server-side).
-- **`clientFetch()`** — Client-side requests with an explicit `accessToken` parameter.
-- **`publicFetch()`** — Unauthenticated requests for public form viewing and submission.
+- **`apiFetch()`**: Server-side authenticated requests (reads auth via `auth()` server-side).
+- **`clientFetch()`**: Client-side requests with an explicit `accessToken` parameter.
+- **`publicFetch()`**: Unauthenticated requests for public form viewing and submission.
 
 This avoids client-side token storage while maintaining type safety through a shared `ApiError` class and consistent response handling.
 
@@ -127,7 +127,7 @@ src/
 ### Prerequisites
 
 - **Node.js** >= 18
-- **pnpm** — install via `npm install -g pnpm` or [corepack](https://nodejs.org/api/corepack.html)
+- **pnpm**: install via `npm install -g pnpm` or [corepack](https://nodejs.org/api/corepack.html)
 - A running instance of the [AI Form Builder backend](https://github.com/bruce-pain/AI-form-builder)
 
 ### Environment Variables
