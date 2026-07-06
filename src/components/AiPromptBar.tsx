@@ -7,9 +7,10 @@ interface AiPromptBarProps {
   onChange: (v: string) => void;
   onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void;
   loading?: boolean;
+  disabled?: boolean;
 }
 
-export function AiPromptBar({ value, onChange, onSubmit, loading }: AiPromptBarProps) {
+export function AiPromptBar({ value, onChange, onSubmit, loading, disabled }: AiPromptBarProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export function AiPromptBar({ value, onChange, onSubmit, loading }: AiPromptBarP
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Describe your form..."
-          disabled={loading}
+          disabled={loading || disabled}
           rows={1}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
@@ -39,7 +40,7 @@ export function AiPromptBar({ value, onChange, onSubmit, loading }: AiPromptBarP
         />
         <button
           type="submit"
-          disabled={!value.trim() || loading}
+          disabled={!value.trim() || loading || disabled}
           className="rounded-lg border border-btn-secondary-border px-4 py-2.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? "Generating..." : "Send \u2192"}

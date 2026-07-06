@@ -107,9 +107,25 @@ export default function NewFormPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [aiGenerating, setAiGenerating] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [formId, setFormId] = useState<string | null>(null);
   const prevFormSnapshotRef = useRef<FormSnapshot>({ title: "", description: "", questions: [] });
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          setSaveError(null);
+          return 0;
+        }
+        setSaveError(`Too many requests. Try again in ${prev - 1} seconds.`);
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [cooldown]);
 
   function handleQuestionChange(index: number, updated: FormQuestion) {
     setQuestions((prev) => {
@@ -180,8 +196,13 @@ export default function NewFormPage() {
         questions: JSON.parse(JSON.stringify(res.data.questions)),
       };
       setPrompt("");
-    } catch {
-      setSaveError("Failed to generate questions. Please try again.");
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 429) {
+        setCooldown(60);
+        setSaveError("Too many requests. Try again in 60 seconds.");
+      } else {
+        setSaveError("Failed to generate questions. Please try again.");
+      }
     } finally {
       setAiGenerating(false);
     }
@@ -316,7 +337,7 @@ export default function NewFormPage() {
       </div>
 
       {!isPreview && (
-        <AiPromptBar value={prompt} onChange={setPrompt} onSubmit={handleAiSubmit} loading={aiGenerating} />
+        <AiPromptBar value={prompt} onChange={setPrompt} onSubmit={handleAiSubmit} loading={aiGenerating} disabled={cooldown > 0} />
       )}
     </div>
   );

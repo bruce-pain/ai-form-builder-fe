@@ -114,7 +114,23 @@ export default function EditFormPage({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [aiGenerating, setAiGenerating] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
   const [conversationId, setConversationId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          setSaveError(null);
+          return 0;
+        }
+        setSaveError(`Too many requests. Try again in ${prev - 1} seconds.`);
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [cooldown]);
 
   useEffect(() => {
     if (!session?.accessToken) return;
@@ -205,8 +221,13 @@ export default function EditFormPage({
         questions: JSON.parse(JSON.stringify(res.data.questions)),
       };
       setPrompt("");
-    } catch {
-      setSaveError("Failed to generate questions. Please try again.");
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 429) {
+        setCooldown(60);
+        setSaveError("Too many requests. Try again in 60 seconds.");
+      } else {
+        setSaveError("Failed to generate questions. Please try again.");
+      }
     } finally {
       setAiGenerating(false);
     }
@@ -367,7 +388,7 @@ export default function EditFormPage({
       </div>
 
       {!isPreview && !isReadOnly && (
-        <AiPromptBar value={prompt} onChange={setPrompt} onSubmit={handleAiSubmit} loading={aiGenerating} />
+        <AiPromptBar value={prompt} onChange={setPrompt} onSubmit={handleAiSubmit} loading={aiGenerating} disabled={cooldown > 0} />
       )}
     </div>
   );
