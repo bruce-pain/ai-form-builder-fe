@@ -7,38 +7,36 @@ export default function Home() {
   const { data: session } = useSession();
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 p-8">
-      <h1 className="text-4xl font-bold text-text-primary">
-        AI Form Builder
-      </h1>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-10 p-8">
+      <div className="flex max-w-md flex-col items-center gap-6 text-center">
+        <span className="text-sm font-medium uppercase tracking-[0.15em] text-text-placeholder">
+          AI Form Builder
+        </span>
+        <h1 className="text-4xl font-bold text-text-primary leading-tight">
+          Describe your form.
+          <br />
+          AI builds it. You refine it.
+        </h1>
+        <p className="text-base text-text-secondary leading-relaxed">
+          Keep the parts you like, change the rest, all through the same
+          conversation.
+        </p>
+      </div>
 
       {session ? (
-        <div className="flex flex-col items-center gap-4">
-          <p className="text-text-primary">
-            Welcome, {session.user?.email ?? "user"}
-          </p>
-          <Link
-            href="/dashboard"
-            className="rounded-lg bg-btn-primary px-6 py-3 text-base font-medium text-btn-primary-text hover:bg-btn-primary-hover"
-          >
-            Go to Dashboard
-          </Link>
-        </div>
+        <Link
+          href="/dashboard"
+          className="rounded-lg bg-btn-primary px-6 py-3 text-base font-medium text-btn-primary-text hover:bg-btn-primary-hover"
+        >
+          Go to dashboard
+        </Link>
       ) : (
-        <div className="flex gap-4">
-          <Link
-            href="/register"
-            className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-text hover:bg-btn-primary-hover"
-          >
-            Sign up
-          </Link>
-          <Link
-            href="/login"
-            className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
-          >
-            Log in
-          </Link>
-        </div>
+        <Link
+          href="/login"
+          className="rounded-lg bg-btn-primary px-6 py-3 text-base font-medium text-btn-primary-text hover:bg-btn-primary-hover"
+        >
+          Log in
+        </Link>
       )}
     </div>
   );
