@@ -243,42 +243,62 @@ export default function NewFormPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex items-center justify-between border-b border-border bg-surface px-6 py-3">
-        <Link
-          href="/dashboard"
-          className="text-sm text-text-secondary hover:text-text-primary"
-        >
-          &larr; Back to dashboard
-        </Link>
-        <div className="flex items-center gap-3">
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8 pb-32">
+        <div className="mx-auto max-w-2xl space-y-6">
           {saveError && (
             <Toast message={saveError} onDismiss={() => setSaveError(null)} />
           )}
-          <button
-            onClick={() => setIsPreview(!isPreview)}
-            className="rounded-lg border border-btn-secondary-border px-4 py-1.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
-          >
-            {isPreview ? "Edit" : "Preview"}
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="rounded-lg border border-btn-secondary-border px-4 py-1.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save"}
-          </button>
-        </div>
-      </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8">
-        <div className="mx-auto max-w-2xl space-y-6">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/dashboard"
+              title="Back to dashboard"
+              className="rounded-md p-1.5 text-text-secondary hover:bg-btn-secondary-hover"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </Link>
+            <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setIsPreview(!isPreview)}
+                title={isPreview ? "Edit" : "Preview"}
+                className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover"
+              >
+                {isPreview ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                title="Save"
+                className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover disabled:opacity-50"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+              </button>
+            </div>
+          </div>
           {!isPreview && (
             <div className="space-y-3">
               <EditableField
                 value={title}
                 onChange={setTitle}
-                className="text-2xl font-bold text-text-primary"
-                inputClassName="w-full text-2xl font-bold text-text-primary bg-transparent border-b-2 border-border-input focus:outline-none py-0.5"
+                isTextarea
+                className="text-2xl font-bold font-heading text-text-primary"
+                inputClassName="w-full text-2xl font-bold font-heading text-text-primary bg-transparent border-b border-border focus:outline-none resize-none py-0.5"
                 placeholder="Form title"
               />
               <EditableField
@@ -286,7 +306,7 @@ export default function NewFormPage() {
                 onChange={setDescription}
                 isTextarea
                 className="w-full text-sm text-text-secondary"
-                inputClassName="w-full text-sm text-text-secondary bg-transparent border-b-2 border-border-input focus:outline-none resize-none py-0.5"
+                inputClassName="w-full text-sm text-text-secondary bg-transparent border-b border-border focus:outline-none resize-none py-0.5"
                 placeholder="Form description (optional)"
               />
             </div>
@@ -300,7 +320,7 @@ export default function NewFormPage() {
             />
           ) : (
             <>
-              <div className="space-y-4">
+              <div>
                 {questions.map((question, index) => (
                   <QuestionCard
                     key={question.id}
