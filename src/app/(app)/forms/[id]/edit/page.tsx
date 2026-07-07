@@ -340,7 +340,7 @@ export default function EditFormPage({
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8">
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8 pb-32">
         <div className="mx-auto max-w-2xl space-y-6">
           {saveError && (
             <Toast message={saveError} onDismiss={() => setSaveError(null)} />
