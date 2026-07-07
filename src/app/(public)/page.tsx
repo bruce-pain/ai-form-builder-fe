@@ -12,7 +12,7 @@ export default function Home() {
         <span className="text-sm font-medium uppercase tracking-[0.15em] text-text-placeholder">
           AI Form Builder
         </span>
-        <h1 className="text-4xl font-bold text-text-primary leading-tight">
+        <h1 className="text-5xl font-heading text-text-primary leading-tight">
           Describe your form.
           <br />
           AI builds it. You refine it.

@@ -2,6 +2,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  --font-heading: "Bricolage Grotesque", sans-serif;
+  --font-body: "Outfit", sans-serif;
+
   --color-page: var(--page);
   --color-surface: var(--surface);
   --color-input: var(--input);
@@ -27,6 +30,10 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
+}
+
+body {
+  font-family: var(--font-body);
 }
 
 :root {
