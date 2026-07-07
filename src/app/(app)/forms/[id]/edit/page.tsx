@@ -9,7 +9,7 @@ import { FormPreview } from "@/components/FormPreview";
 import { AiPromptBar } from "@/components/AiPromptBar";
 import { Toast } from "@/components/Toast";
 import { ApiError } from "@/lib/api";
-import { getFormClient, updateFormClient, generateQuestionsClient } from "@/lib/form";
+import { getFormClient, updateFormClient, deleteFormClient, generateQuestionsClient } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
 import { buildEditsSummary, type FormSnapshot } from "@/lib/editTracker";
 
@@ -116,6 +116,8 @@ export default function EditFormPage({
   const [aiGenerating, setAiGenerating] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -133,6 +135,16 @@ export default function EditFormPage({
   }, [cooldown]);
 
   useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
     if (!session?.accessToken) return;
 
     getFormClient(session.accessToken, id)
@@ -142,9 +154,6 @@ export default function EditFormPage({
         setDescription(data.description ?? "");
         setQuestions(data.questions ?? []);
         setIsPublished(data.is_published);
-        if (data.is_published) {
-          setIsPreview(true);
-        }
 
         setConversationId(data.conversation_id);
 
@@ -176,7 +185,7 @@ export default function EditFormPage({
     });
   }
 
-  function handleDelete(index: number) {
+  function deleteQuestion(index: number) {
     if (questions.length <= 1) return;
     setQuestions((prev) => prev.filter((_, i) => i !== index));
   }
@@ -234,21 +243,17 @@ export default function EditFormPage({
   }
 
   async function handleSave() {
-    if (saving) return;
+    if (saving || !session?.accessToken) return;
     setSaving(true);
     setSaveError(null);
 
     try {
-      if (!session?.accessToken) {
-        throw new Error("Not authenticated");
-      }
       await updateFormClient(session.accessToken, id, {
         title,
         description: description || null,
         questions: questions.length > 0 ? questions : null,
-        is_published: isPublished,
+        is_published: false,
       });
-      router.push("/dashboard");
     } catch (err) {
       setSaveError(err instanceof ApiError ? err.message : "Failed to save form");
     } finally {
@@ -256,7 +261,37 @@ export default function EditFormPage({
     }
   }
 
-  const isReadOnly = isPublished;
+  async function handlePublish() {
+    if (saving || !session?.accessToken) return;
+    if (!window.confirm("Publish this form? It will be publicly accessible.")) return;
+    setSaving(true);
+    setSaveError(null);
+
+    try {
+      await updateFormClient(session.accessToken, id, {
+        title,
+        description: description || null,
+        questions: questions.length > 0 ? questions : null,
+        is_published: true,
+      });
+      router.push("/dashboard");
+    } catch (err) {
+      setSaveError(err instanceof ApiError ? err.message : "Failed to publish form");
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!session?.accessToken) return;
+    if (!window.confirm("Are you sure you want to delete this form? This action cannot be undone.")) return;
+
+    try {
+      await deleteFormClient(session.accessToken, id);
+      router.push("/dashboard");
+    } catch (err) {
+      setSaveError(err instanceof ApiError ? err.message : "Failed to delete form");
+    }
+  }
 
   if (loading) {
     return (
@@ -279,42 +314,116 @@ export default function EditFormPage({
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex items-center justify-between border-b border-border bg-surface px-6 py-3">
-        <Link
-          href="/dashboard"
-          className="text-sm text-text-secondary hover:text-text-primary"
-        >
-          &larr; Back to dashboard
-        </Link>
-        {isReadOnly ? (
-          <span className="text-xs font-medium text-green-600 dark:text-green-400">
-            Published
-          </span>
-        ) : (
-          <div className="flex items-center gap-3">
-            {saveError && (
-              <Toast message={saveError} onDismiss={() => setSaveError(null)} />
-            )}
-            <button
-              onClick={() => setIsPreview(!isPreview)}
-              className="rounded-lg border border-btn-secondary-border px-4 py-1.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
-            >
-              {isPreview ? "Edit" : "Preview"}
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="rounded-lg border border-btn-secondary-border px-4 py-1.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {saving ? "Saving..." : "Save"}
-            </button>
-          </div>
-        )}
-      </div>
-
       <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8">
         <div className="mx-auto max-w-2xl space-y-6">
-          {isReadOnly ? (
+          {saveError && (
+            <Toast message={saveError} onDismiss={() => setSaveError(null)} />
+          )}
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/dashboard"
+              title="Back to dashboard"
+              className="rounded-md p-1.5 text-text-secondary hover:bg-btn-secondary-hover"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+            </Link>
+            <div className="ml-auto flex items-center gap-3">
+              <button
+                onClick={() => setIsPreview(!isPreview)}
+                title={isPreview ? "Edit" : "Preview"}
+                className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover"
+              >
+                {isPreview ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                title="Save"
+                className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover disabled:opacity-50"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+              </button>
+              <div ref={menuRef} className="relative">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
+                  title="More"
+                  className="rounded-md p-1.5 text-text-secondary hover:bg-btn-secondary-hover"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="1.5" />
+                    <circle cx="12" cy="12" r="1.5" />
+                    <circle cx="12" cy="19" r="1.5" />
+                  </svg>
+                </button>
+                {menuOpen && (
+                  <div className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-lg border border-border bg-page py-1 text-sm shadow-sm">
+                    <button
+                      onClick={() => { handlePublish(); setMenuOpen(false); }}
+                      disabled={saving}
+                      className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-text-primary hover:bg-btn-secondary-hover disabled:opacity-50"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                      </svg>
+                      Publish
+                    </button>
+                    <hr className="mx-3 border-t border-border" />
+                    <button
+                      onClick={() => { handleDelete(); setMenuOpen(false); }}
+                      className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      </svg>
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {!isPreview && (
+            <div className="space-y-3">
+              <EditableField
+                value={title}
+                onChange={setTitle}
+                className="text-2xl font-bold text-text-primary"
+                inputClassName="w-full text-2xl font-bold text-text-primary bg-transparent border-b-2 border-border-input focus:outline-none py-0.5"
+                placeholder="Form title"
+              />
+              <EditableField
+                value={description}
+                onChange={setDescription}
+                isTextarea
+                className="w-full text-sm text-text-secondary"
+                inputClassName="w-full text-sm text-text-secondary bg-transparent border-b-2 border-border-input focus:outline-none resize-none py-0.5"
+                placeholder="Form description (optional)"
+              />
+            </div>
+          )}
+
+          {isPreview ? (
             <FormPreview
               questions={questions}
               title={title}
@@ -322,72 +431,43 @@ export default function EditFormPage({
             />
           ) : (
             <>
-              {!isPreview && (
-                <div className="space-y-3">
-                  <EditableField
-                    value={title}
-                    onChange={setTitle}
-                    className="text-2xl font-bold text-text-primary"
-                    inputClassName="w-full text-2xl font-bold text-text-primary bg-transparent border-b-2 border-border-input focus:outline-none py-0.5"
-                    placeholder="Form title"
+              <div className="space-y-4">
+                {questions.map((question, index) => (
+                  <QuestionCard
+                    key={question.id}
+                    question={question}
+                    onChange={(updated) => handleQuestionChange(index, updated)}
+                    onDelete={() => deleteQuestion(index)}
                   />
-                  <EditableField
-                    value={description}
-                    onChange={setDescription}
-                    isTextarea
-                    className="w-full text-sm text-text-secondary"
-                    inputClassName="w-full text-sm text-text-secondary bg-transparent border-b-2 border-border-input focus:outline-none resize-none py-0.5"
-                    placeholder="Form description (optional)"
-                  />
-                </div>
-              )}
-              {isPreview ? (
-                <FormPreview
-                  questions={questions}
-                  title={title}
-                  description={description}
-                />
-              ) : (
-                <>
-                  <div className="space-y-4">
-                    {questions.map((question, index) => (
-                      <QuestionCard
-                        key={question.id}
-                        question={question}
-                        onChange={(updated) => handleQuestionChange(index, updated)}
-                        onDelete={() => handleDelete(index)}
-                      />
-                    ))}
-                  </div>
+                ))}
+              </div>
 
-                  <button
-                    onClick={handleAdd}
-                    className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="12" y1="5" x2="12" y2="19" />
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                    </svg>
-                    Add question
-                  </button>
-                </>
-              )}
+              <button
+                onClick={handleAdd}
+                className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Add question
+              </button>
             </>
           )}
         </div>
       </div>
 
-      {!isPreview && !isReadOnly && (
+      {!isPreview && (
         <AiPromptBar value={prompt} onChange={setPrompt} onSubmit={handleAiSubmit} loading={aiGenerating} disabled={cooldown > 0} />
       )}
     </div>
