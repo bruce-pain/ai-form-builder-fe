@@ -9,7 +9,12 @@ import { FormPreview } from "@/components/FormPreview";
 import { AiPromptBar } from "@/components/AiPromptBar";
 import { Toast } from "@/components/Toast";
 import { ApiError } from "@/lib/api";
-import { getFormClient, updateFormClient, deleteFormClient, generateQuestionsClient } from "@/lib/form";
+import {
+  getFormClient,
+  updateFormClient,
+  deleteFormClient,
+  generateQuestionsClient,
+} from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
 import { buildEditsSummary, type FormSnapshot } from "@/lib/editTracker";
 
@@ -71,11 +76,7 @@ function EditableField({
       onClick={() => setEditing(true)}
       className={`cursor-pointer ${className}`}
     >
-      {value || (
-        <span className="text-text-placeholder">
-          {placeholder}
-        </span>
-      )}
+      {value || <span className="text-text-placeholder">{placeholder}</span>}
     </div>
   );
 }
@@ -89,7 +90,11 @@ export default function EditFormPage({
   const router = useRouter();
   const { data: session } = useSession();
   const idCounter = useRef(0);
-  const prevFormSnapshotRef = useRef<FormSnapshot>({ title: "", description: "", questions: [] });
+  const prevFormSnapshotRef = useRef<FormSnapshot>({
+    title: "",
+    description: "",
+    questions: [],
+  });
 
   function createBlankQuestion(): FormQuestion {
     idCounter.current += 1;
@@ -172,7 +177,9 @@ export default function EditFormPage({
         }
       })
       .catch((err) => {
-        setLoadError(err instanceof ApiError ? err.message : "Failed to load form");
+        setLoadError(
+          err instanceof ApiError ? err.message : "Failed to load form",
+        );
       })
       .finally(() => setLoading(false));
   }, [session, id]);
@@ -207,7 +214,10 @@ export default function EditFormPage({
         description,
         questions,
       };
-      const editsSummary = buildEditsSummary(prevFormSnapshotRef.current, currentSnapshot);
+      const editsSummary = buildEditsSummary(
+        prevFormSnapshotRef.current,
+        currentSnapshot,
+      );
       const fullPrompt = editsSummary ? editsSummary + "\n" + prompt : prompt;
 
       const res = await generateQuestionsClient(
@@ -217,12 +227,13 @@ export default function EditFormPage({
         {
           title: title || null,
           description: description || null,
-          questions: questions.filter(q => q.text.trim()),
+          questions: questions.filter((q) => q.text.trim()),
         },
       );
       setQuestions(res.data.questions);
       if (res.data.title !== undefined) setTitle(res.data.title ?? "");
-      if (res.data.description !== undefined) setDescription(res.data.description ?? "");
+      if (res.data.description !== undefined)
+        setDescription(res.data.description ?? "");
       setConversationId(res.conversation_id ?? null);
       prevFormSnapshotRef.current = {
         title: res.data.title ?? "",
@@ -255,7 +266,9 @@ export default function EditFormPage({
         is_published: false,
       });
     } catch (err) {
-      setSaveError(err instanceof ApiError ? err.message : "Failed to save form");
+      setSaveError(
+        err instanceof ApiError ? err.message : "Failed to save form",
+      );
     } finally {
       setSaving(false);
     }
@@ -263,7 +276,8 @@ export default function EditFormPage({
 
   async function handlePublish() {
     if (saving || !session?.accessToken) return;
-    if (!window.confirm("Publish this form? It will be publicly accessible.")) return;
+    if (!window.confirm("Publish this form? It will be publicly accessible."))
+      return;
     setSaving(true);
     setSaveError(null);
 
@@ -276,20 +290,29 @@ export default function EditFormPage({
       });
       router.push("/dashboard");
     } catch (err) {
-      setSaveError(err instanceof ApiError ? err.message : "Failed to publish form");
+      setSaveError(
+        err instanceof ApiError ? err.message : "Failed to publish form",
+      );
       setSaving(false);
     }
   }
 
   async function handleDelete() {
     if (!session?.accessToken) return;
-    if (!window.confirm("Are you sure you want to delete this form? This action cannot be undone.")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this form? This action cannot be undone.",
+      )
+    )
+      return;
 
     try {
       await deleteFormClient(session.accessToken, id);
       router.push("/dashboard");
     } catch (err) {
-      setSaveError(err instanceof ApiError ? err.message : "Failed to delete form");
+      setSaveError(
+        err instanceof ApiError ? err.message : "Failed to delete form",
+      );
     }
   }
 
@@ -305,7 +328,10 @@ export default function EditFormPage({
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-page">
         <p className="text-sm text-red-500">{loadError}</p>
-        <Link href="/dashboard" className="text-sm text-text-secondary hover:text-text-primary">
+        <Link
+          href="/dashboard"
+          className="text-sm text-text-secondary hover:text-text-primary"
+        >
           &larr; Back to dashboard
         </Link>
       </div>
@@ -326,7 +352,16 @@ export default function EditFormPage({
               title="Back to dashboard"
               className="rounded-md p-1.5 text-text-secondary hover:bg-btn-secondary-hover"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M19 12H5" />
                 <polyline points="12 19 5 12 12 5" />
               </svg>
@@ -338,11 +373,29 @@ export default function EditFormPage({
                 className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover"
               >
                 {isPreview ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                   </svg>
                 ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                     <circle cx="12" cy="12" r="3" />
                   </svg>
@@ -354,7 +407,16 @@ export default function EditFormPage({
                 title="Save"
                 className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover disabled:opacity-50"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
                   <polyline points="17 21 17 13 7 13 7 21" />
                   <polyline points="7 3 7 8 15 8" />
@@ -362,11 +424,19 @@ export default function EditFormPage({
               </button>
               <div ref={menuRef} className="relative">
                 <button
-                  onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuOpen((o) => !o);
+                  }}
                   title="More"
                   className="rounded-md p-1.5 text-text-secondary hover:bg-btn-secondary-hover"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
                     <circle cx="12" cy="5" r="1.5" />
                     <circle cx="12" cy="12" r="1.5" />
                     <circle cx="12" cy="19" r="1.5" />
@@ -375,11 +445,23 @@ export default function EditFormPage({
                 {menuOpen && (
                   <div className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-lg border border-border bg-page py-1 text-sm shadow-sm">
                     <button
-                      onClick={() => { handlePublish(); setMenuOpen(false); }}
+                      onClick={() => {
+                        handlePublish();
+                        setMenuOpen(false);
+                      }}
                       disabled={saving}
                       className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-text-primary hover:bg-btn-secondary-hover disabled:opacity-50"
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                         <polyline points="17 8 12 3 7 8" />
                         <line x1="12" y1="3" x2="12" y2="15" />
@@ -388,10 +470,22 @@ export default function EditFormPage({
                     </button>
                     <hr className="mx-3 border-t border-border" />
                     <button
-                      onClick={() => { handleDelete(); setMenuOpen(false); }}
+                      onClick={() => {
+                        handleDelete();
+                        setMenuOpen(false);
+                      }}
                       className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <polyline points="3 6 5 6 21 6" />
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                       </svg>
@@ -408,8 +502,9 @@ export default function EditFormPage({
               <EditableField
                 value={title}
                 onChange={setTitle}
-                className="text-2xl font-bold text-text-primary"
-                inputClassName="w-full text-2xl font-bold text-text-primary bg-transparent border-b-2 border-border-input focus:outline-none py-0.5"
+                isTextarea
+                className="text-2xl font-bold font-heading text-text-primary"
+                inputClassName="w-full text-2xl font-bold font-heading text-text-primary bg-transparent border-b-2 border-border-input focus:outline-none resize-none py-0.5"
                 placeholder="Form title"
               />
               <EditableField
@@ -431,10 +526,11 @@ export default function EditFormPage({
             />
           ) : (
             <>
-              <div className="space-y-4">
+              <div>
                 {questions.map((question, index) => (
                   <QuestionCard
                     key={question.id}
+                    questionIndex={index}
                     question={question}
                     onChange={(updated) => handleQuestionChange(index, updated)}
                     onDelete={() => deleteQuestion(index)}
@@ -468,7 +564,13 @@ export default function EditFormPage({
       </div>
 
       {!isPreview && (
-        <AiPromptBar value={prompt} onChange={setPrompt} onSubmit={handleAiSubmit} loading={aiGenerating} disabled={cooldown > 0} />
+        <AiPromptBar
+          value={prompt}
+          onChange={setPrompt}
+          onSubmit={handleAiSubmit}
+          loading={aiGenerating}
+          disabled={cooldown > 0}
+        />
       )}
     </div>
   );

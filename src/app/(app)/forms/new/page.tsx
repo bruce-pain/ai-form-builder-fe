@@ -304,6 +304,7 @@ export default function NewFormPage() {
                 {questions.map((question, index) => (
                   <QuestionCard
                     key={question.id}
+                    questionIndex={index}
                     question={question}
                     onChange={(updated) => handleQuestionChange(index, updated)}
                     onDelete={() => handleDelete(index)}
