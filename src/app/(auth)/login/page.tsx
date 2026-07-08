@@ -35,7 +35,7 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="flex w-full max-w-sm flex-col gap-6"
       >
-        <h1 className="text-3xl font-bold text-text-primary">
+        <h1 className="text-3xl font-bold font-heading text-text-primary">
           Log in
         </h1>
 

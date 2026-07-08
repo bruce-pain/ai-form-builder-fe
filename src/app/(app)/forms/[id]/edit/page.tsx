@@ -16,6 +16,7 @@ import {
   generateQuestionsClient,
 } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
+import { ArrowLeft, Eye, Pencil, Save, MoreVertical, Upload, Trash2, Plus } from "lucide-react";
 import { buildEditsSummary, type FormSnapshot } from "@/lib/editTracker";
 
 function EditableField({
@@ -352,19 +353,7 @@ export default function EditFormPage({
               title="Back to dashboard"
               className="rounded-md p-1.5 text-text-secondary hover:bg-btn-secondary-hover"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M19 12H5" />
-                <polyline points="12 19 5 12 12 5" />
-              </svg>
+              <ArrowLeft size={16} />
             </Link>
             <div className="ml-auto flex items-center gap-3">
               <button
@@ -373,32 +362,9 @@ export default function EditFormPage({
                 className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover"
               >
                 {isPreview ? (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                  </svg>
+                  <Pencil size={16} />
                 ) : (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
+                  <Eye size={16} />
                 )}
               </button>
               <button
@@ -407,20 +373,7 @@ export default function EditFormPage({
                 title="Save"
                 className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover disabled:opacity-50"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                  <polyline points="17 21 17 13 7 13 7 21" />
-                  <polyline points="7 3 7 8 15 8" />
-                </svg>
+                <Save size={16} />
               </button>
               <div ref={menuRef} className="relative">
                 <button
@@ -431,16 +384,7 @@ export default function EditFormPage({
                   title="More"
                   className="rounded-md p-1.5 text-text-secondary hover:bg-btn-secondary-hover"
                 >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <circle cx="12" cy="5" r="1.5" />
-                    <circle cx="12" cy="12" r="1.5" />
-                    <circle cx="12" cy="19" r="1.5" />
-                  </svg>
+                  <MoreVertical size={16} />
                 </button>
                 {menuOpen && (
                   <div className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-lg border border-border bg-page py-1 text-sm shadow-sm">
@@ -452,20 +396,7 @@ export default function EditFormPage({
                       disabled={saving}
                       className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-text-primary hover:bg-btn-secondary-hover disabled:opacity-50"
                     >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="17 8 12 3 7 8" />
-                        <line x1="12" y1="3" x2="12" y2="15" />
-                      </svg>
+                      <Upload size={14} />
                       Publish
                     </button>
                     <hr className="mx-3 border-t border-border" />
@@ -476,19 +407,7 @@ export default function EditFormPage({
                       }}
                       className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
                     >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                      </svg>
+                      <Trash2 size={14} />
                       Delete
                     </button>
                   </div>
@@ -542,20 +461,7 @@ export default function EditFormPage({
                 onClick={handleAdd}
                 className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
+                <Plus size={14} />
                 Add question
               </button>
             </>

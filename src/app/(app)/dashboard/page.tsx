@@ -64,6 +64,8 @@ export default async function DashboardPage() {
               </h3>
               <p className="text-sm text-text-secondary">{form.description}</p>
               <div className="flex items-center gap-1.5 pt-0.5 text-xs text-text-placeholder">
+                <span>Updated {formatDate(form.updated_at)}</span>
+                <span className="text-text-placeholder">·</span>
                 <span
                   className={
                     form.is_published
@@ -74,7 +76,6 @@ export default async function DashboardPage() {
                   {form.is_published ? "Published" : "Draft"}
                 </span>
                 {form.is_published && <ShareButton formId={form.id} />}
-                <span>· Updated {formatDate(form.updated_at)}</span>
               </div>
             </Link>
           ))}

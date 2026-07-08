@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { Loader, Send } from "lucide-react";
 
 interface AiPromptBarProps {
   value: string;
@@ -50,24 +51,9 @@ export function AiPromptBar({ value, onChange, onSubmit, loading, disabled }: Ai
         className="flex shrink-0 items-center justify-center rounded-full bg-btn-primary p-4 text-btn-primary-text hover:bg-btn-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? (
-          <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" opacity="0.25" />
-            <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-          </svg>
+          <Loader size={16} className="animate-spin" />
         ) : (
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M22 2L11 13" />
-            <path d="M22 2l-7 20-4-9-9-4 20-7z" />
-          </svg>
+          <Send size={16} />
         )}
       </button>
     </form>

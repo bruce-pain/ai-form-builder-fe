@@ -1,5 +1,7 @@
 "use client";
 
+import { X } from "lucide-react";
+
 interface ToastProps {
   message: string;
   onDismiss: () => void;
@@ -15,18 +17,7 @@ export function Toast({ message, onDismiss }: ToastProps) {
           className="mt-0.5 text-text-placeholder hover:text-text-primary"
           aria-label="Dismiss"
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          >
-            <line x1="1" y1="1" x2="13" y2="13" />
-            <line x1="13" y1="1" x2="1" y2="13" />
-          </svg>
+          <X size={14} />
         </button>
       </div>
     </div>

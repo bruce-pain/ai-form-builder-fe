@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { FormQuestion } from "@/types/form";
+import { ChevronDown, X, Plus, Trash2 } from "lucide-react";
 
 interface QuestionCardProps {
   questionIndex: number;
@@ -116,19 +117,7 @@ export function QuestionCard({
                 <option value="text">Text</option>
                 <option value="select">Select</option>
               </select>
-              <svg
-                className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-text-placeholder"
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
+              <ChevronDown size={12} className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-text-placeholder" />
             </div>
 
             {question.answer_type === "select" && (
@@ -161,38 +150,12 @@ export function QuestionCard({
                       onClick={() => removeOption(option)}
                       className="text-text-placeholder hover:text-text-secondary"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
+                      <X size={14} />
                     </button>
                   </div>
                 ))}
               <div className="flex items-center gap-2 border-b border-border py-2">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="shrink-0 text-text-placeholder"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
+                <Plus size={14} className="shrink-0 text-text-placeholder" />
                 <input
                   type="text"
                   value={newOption}
@@ -216,21 +179,7 @@ export function QuestionCard({
           className="shrink-0 rounded-md p-1.5 text-text-placeholder hover:bg-btn-secondary-hover hover:text-text-secondary"
           title="Delete question"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 6h18" />
-            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-          </svg>
+          <Trash2 size={16} />
         </button>
       </div>
     </div>

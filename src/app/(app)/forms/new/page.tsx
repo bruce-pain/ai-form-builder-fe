@@ -11,6 +11,7 @@ import { Toast } from "@/components/Toast";
 import { ApiError } from "@/lib/api";
 import { createFormClient, generateQuestionsClient, updateFormClient } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
+import { ArrowLeft, Eye, Pencil, Save, Plus } from "lucide-react";
 import { buildEditsSummary, type FormSnapshot } from "@/lib/editTracker";
 
 function EditableField({
@@ -255,10 +256,7 @@ export default function NewFormPage() {
               title="Back to dashboard"
               className="rounded-md p-1.5 text-text-secondary hover:bg-btn-secondary-hover"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5" />
-                <polyline points="12 19 5 12 12 5" />
-              </svg>
+              <ArrowLeft size={16} />
             </Link>
             <div className="ml-auto flex items-center gap-3">
               <button
@@ -267,14 +265,9 @@ export default function NewFormPage() {
                 className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover"
               >
                 {isPreview ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                  </svg>
+                  <Pencil size={16} />
                 ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
+                  <Eye size={16} />
                 )}
               </button>
               <button
@@ -283,11 +276,7 @@ export default function NewFormPage() {
                 title="Save"
                 className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover disabled:opacity-50"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                  <polyline points="17 21 17 13 7 13 7 21" />
-                  <polyline points="7 3 7 8 15 8" />
-                </svg>
+                <Save size={16} />
               </button>
             </div>
           </div>
@@ -336,20 +325,7 @@ export default function NewFormPage() {
                 onClick={handleAdd}
                 className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
+                <Plus size={14} />
                 Add question
               </button>
             </>
