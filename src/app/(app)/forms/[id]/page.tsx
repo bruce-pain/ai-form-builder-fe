@@ -4,8 +4,9 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, Link2, Share2, Trash2 } from "lucide-react";
 import { ApiError } from "@/lib/api";
-import { getFormClient, deleteFormClient, getFormResponsesClient } from "@/lib/form";
+import { getFormClient, deleteFormClient, updateFormClient, getFormResponsesClient } from "@/lib/form";
 import type { FormResponseListItem, FormQuestion } from "@/types/form";
 
 function formatDate(iso: string) {
@@ -81,6 +82,23 @@ export default function FormDetailPage({
     }
   }
 
+  async function handleUnpublish() {
+    if (actionLoading || !session?.accessToken) return;
+    if (!window.confirm("Unpublish this form? It will no longer be publicly accessible.")) return;
+    setActionLoading("unpublish");
+    try {
+      await updateFormClient(session.accessToken, id, {
+        is_published: false,
+      });
+      router.push(`/forms/${id}/edit`);
+    } catch (err) {
+      console.error(
+        err instanceof ApiError ? err.message : "Failed to unpublish form",
+      );
+      setActionLoading(null);
+    }
+  }
+
   async function handleShare() {
     const url = `${window.location.origin}/forms/public/${id}`;
     try {
@@ -123,66 +141,74 @@ export default function FormDetailPage({
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex items-center justify-between border-b border-border bg-surface px-6 py-3">
-        <Link
-          href="/dashboard"
-          className="text-sm text-text-secondary hover:text-text-primary"
-        >
-          &larr; Back to dashboard
-        </Link>
-        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-          Published
-        </span>
-      </div>
-
       <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8">
         <div className="mx-auto max-w-2xl space-y-8">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-sm text-text-secondary hover:bg-btn-secondary-hover"
+          >
+            <ArrowLeft size={16} />
+            Back
+          </Link>
+
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">{title}</h1>
+            <h1 className="text-2xl font-bold font-heading text-text-primary">{title}</h1>
             {description && (
               <p className="mt-1 text-sm text-text-secondary">{description}</p>
             )}
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href={`/forms/public/${id}`}
-              className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
-            >
-              Preview
-            </Link>
-            <button
-              onClick={handleShare}
-              className="rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
-            >
-              {copied ? "Copied!" : "Share"}
-            </button>
-            <button
-              onClick={handleDelete}
-              disabled={actionLoading === "delete"}
-              className="rounded-lg bg-btn-destructive-bg px-4 py-2 text-sm font-medium text-btn-destructive-text hover:bg-btn-destructive-hover disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {actionLoading === "delete" ? "Deleting..." : "Delete"}
-            </button>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-sm text-green-600 dark:text-green-400">
+              Published
+            </span>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-btn-secondary-text hover:bg-btn-secondary-hover"
+              >
+                {copied ? (
+                  <><Check size={14} /> Link copied</>
+                ) : (
+                  <><Share2 size={14} /> Share</>
+                )}
+              </button>
+              <button
+                onClick={handleUnpublish}
+                disabled={actionLoading === "unpublish"}
+                className="text-sm text-btn-secondary-text hover:text-text-primary disabled:opacity-50"
+              >
+                {actionLoading === "unpublish" ? "Unpublishing..." : "Unpublish"}
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={actionLoading === "delete"}
+                className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-btn-secondary-text hover:bg-btn-secondary-hover disabled:opacity-50"
+              >
+                <Trash2 size={14} />
+                Delete
+              </button>
+            </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-surface p-4">
-            <p className="text-sm text-text-secondary">Total Responses</p>
-            <p className="mt-1 text-2xl font-bold text-text-primary">
+          <div>
+            <p className="text-xs text-text-placeholder">Total Responses</p>
+            <p className="mt-0.5 text-3xl font-bold text-text-primary">
               {responses.length}
             </p>
           </div>
 
           {responses.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border-input py-20">
+            <div className="flex flex-col items-center justify-center py-20">
               <p className="text-lg text-text-secondary">No responses yet</p>
               <p className="mt-1 text-sm text-text-placeholder">
                 Share your form to start collecting responses
               </p>
               <button
                 onClick={handleShare}
-                className="mt-4 rounded-lg border border-btn-secondary-border px-4 py-2 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-btn-secondary-text underline decoration-btn-secondary-text/30 underline-offset-2 hover:bg-btn-secondary-hover hover:decoration-btn-secondary-text/60"
               >
+                <Link2 className="h-4 w-4" />
                 {copied ? "Copied!" : "Copy Link"}
               </button>
             </div>
@@ -191,20 +217,20 @@ export default function FormDetailPage({
               <div className="flex gap-4 border-b border-border">
                 <button
                   onClick={() => setActiveTab("summary")}
-                  className={`border-b-2 px-1 pb-2 text-sm font-medium transition ${
+                  className={`border-b-2 px-1 pb-2 text-sm transition ${
                     activeTab === "summary"
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-text-secondary hover:text-text-primary"
+                      ? "border-text-primary font-medium text-text-primary"
+                      : "border-transparent font-normal text-text-secondary hover:text-text-primary"
                   }`}
                 >
                   Summary
                 </button>
                 <button
                   onClick={() => setActiveTab("individual")}
-                  className={`border-b-2 px-1 pb-2 text-sm font-medium transition ${
+                  className={`border-b-2 px-1 pb-2 text-sm transition ${
                     activeTab === "individual"
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-text-secondary hover:text-text-primary"
+                      ? "border-text-primary font-medium text-text-primary"
+                      : "border-transparent font-normal text-text-secondary hover:text-text-primary"
                   }`}
                 >
                   Individual
@@ -241,16 +267,16 @@ export default function FormDetailPage({
                           return (
                             <div key={q.id}>
                               <div className="mb-3">
-                                <h3 className="font-medium text-text-primary">{q.text}</h3>
+                                <h3 className="text-lg font-semibold text-text-primary">{q.text}</h3>
                                 <p className="text-xs text-text-secondary">
                                   {q.answer_type === "select" ? "Select" : "Text"} &middot; {qAnswers.length} {qAnswers.length === 1 ? "answer" : "answers"}
                                 </p>
                               </div>
-                              <div className="divide-y divide-border bg-surface">
+                              <div className="divide-y divide-border">
                                 {displayed.map((a, i) => (
                                   <div
                                     key={i}
-                                    className={`px-3 py-2 text-sm ${
+                                    className={`py-2 text-sm ${
                                       a.text === "(no answer)"
                                         ? "text-text-placeholder"
                                         : "text-text-primary"
@@ -290,9 +316,9 @@ export default function FormDetailPage({
                           <button
                             disabled={currentIndex === 0}
                             onClick={() => setCurrentIndex(currentIndex - 1)}
-                            className="rounded-lg border border-btn-secondary-border px-3 py-1.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover disabled:cursor-not-allowed disabled:opacity-40"
+                            className="rounded-md p-1.5 text-text-secondary hover:bg-btn-secondary-hover disabled:cursor-not-allowed disabled:opacity-40"
                           >
-                            &larr; Prev
+                            <ChevronLeft size={18} />
                           </button>
                           <div className="flex items-center gap-1.5">
                             <span className="text-xs text-text-secondary">Go to:</span>
@@ -309,24 +335,24 @@ export default function FormDetailPage({
                                   }
                                 }
                               }}
-                              className="w-16 rounded-lg border border-border px-2 py-1 text-sm text-text-primary"
+                              className="w-12 border-0 border-b border-border bg-transparent pb-0.5 text-center text-sm text-text-primary focus:border-gray-400 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
                             />
                           </div>
                           <button
                             disabled={currentIndex === responses.length - 1}
                             onClick={() => setCurrentIndex(currentIndex + 1)}
-                            className="rounded-lg border border-btn-secondary-border px-3 py-1.5 text-sm font-medium text-btn-secondary-text hover:bg-btn-secondary-hover disabled:cursor-not-allowed disabled:opacity-40"
+                            className="rounded-md p-1.5 text-text-secondary hover:bg-btn-secondary-hover disabled:cursor-not-allowed disabled:opacity-40"
                           >
-                            Next &rarr;
+                            <ChevronRight size={18} />
                           </button>
                         </div>
                       </div>
 
-                      <p className="mt-4 text-sm text-text-secondary">
+                      <p className="mb-6 mt-4 text-sm text-text-secondary">
                         Submitted {formatDate(response.created_at)}
                       </p>
 
-                      <div className="mt-6 space-y-4">
+                      <div className="divide-y divide-border">
                         {response.answers.map((answer) => {
                           const question = questions?.find(
                             (q) => q.id === answer.question_id,
@@ -334,34 +360,23 @@ export default function FormDetailPage({
                           return (
                             <div
                               key={answer.question_id}
-                              className="rounded-xl border border-border bg-surface p-4"
+                              className="py-4 first:pt-0"
                             >
-                              <p className="text-sm font-medium text-text-primary">
+                              <p className="text-base font-semibold text-text-primary">
                                 {question?.text || "(Unknown question)"}
                               </p>
-                              <div className="mt-2">
+                              <div className="mt-1">
                                 {answer.answer_type === "text" ? (
                                   <p className="text-sm text-text-secondary">
                                     {answer.text_answer || "(no answer)"}
                                   </p>
                                 ) : (
-                                  <div className="flex flex-wrap gap-2">
+                                  <p className="text-sm text-text-secondary">
                                     {answer.select_answer &&
-                                    answer.select_answer.length > 0 ? (
-                                      answer.select_answer.map((option) => (
-                                        <span
-                                          key={option}
-                                          className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-                                        >
-                                          {option}
-                                        </span>
-                                      ))
-                                    ) : (
-                                      <p className="text-sm text-text-secondary">
-                                        (no answer)
-                                      </p>
-                                    )}
-                                  </div>
+                                    answer.select_answer.length > 0
+                                      ? answer.select_answer.join(", ")
+                                      : "(no answer)"}
+                                  </p>
                                 )}
                               </div>
                             </div>
