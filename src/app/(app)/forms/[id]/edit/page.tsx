@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { QuestionCard } from "@/components/QuestionCard";
-import { FormPreview } from "@/components/FormPreview";
 import { AiPromptBar } from "@/components/AiPromptBar";
 import { Toast } from "@/components/Toast";
 import { ApiError } from "@/lib/api";
@@ -16,7 +15,7 @@ import {
   generateQuestionsClient,
 } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
-import { ArrowLeft, Eye, Pencil, Save, MoreVertical, Upload, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Loader, Save, MoreVertical, Upload, Trash2, Plus } from "lucide-react";
 import { buildEditsSummary, type FormSnapshot } from "@/lib/editTracker";
 
 function EditableField({
@@ -115,7 +114,6 @@ export default function EditFormPage({
   const [prompt, setPrompt] = useState("");
   const [questions, setQuestions] = useState<FormQuestion[]>([]);
   const [isPublished, setIsPublished] = useState(false);
-  const [isPreview, setIsPreview] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -124,6 +122,10 @@ export default function EditFormPage({
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const lastSavedRef = useRef<string>("");
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "unsaved" | "saving" | "saved" | "error">("idle");
+  const autoSavedStatusRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -176,6 +178,12 @@ export default function EditFormPage({
             ...data.questions.map((q) => parseInt(q.id, 10)),
           );
         }
+
+        lastSavedRef.current = JSON.stringify({
+          title: data.title,
+          description: data.description ?? "",
+          questions: data.questions ?? [],
+        });
       })
       .catch((err) => {
         setLoadError(
@@ -184,6 +192,27 @@ export default function EditFormPage({
       })
       .finally(() => setLoading(false));
   }, [session, id]);
+
+  useEffect(() => {
+    if (loading) return;
+    if (hasChanges()) {
+      setAutoSaveStatus("unsaved");
+      scheduleAutoSave();
+    }
+    return () => {
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    };
+  }, [title, description, questions, loading]);
+
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (!hasChanges()) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [title, description, questions]);
 
   function handleQuestionChange(index: number, updated: FormQuestion) {
     setQuestions((prev) => {
@@ -256,6 +285,7 @@ export default function EditFormPage({
 
   async function handleSave() {
     if (saving || !session?.accessToken) return;
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     setSaving(true);
     setSaveError(null);
 
@@ -266,10 +296,47 @@ export default function EditFormPage({
         questions: questions.length > 0 ? questions : null,
         is_published: false,
       });
+      lastSavedRef.current = JSON.stringify({ title, description, questions });
     } catch (err) {
       setSaveError(
         err instanceof ApiError ? err.message : "Failed to save form",
       );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function hasChanges(): boolean {
+    return JSON.stringify({ title, description, questions }) !== lastSavedRef.current;
+  }
+
+  function scheduleAutoSave() {
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    autoSaveTimerRef.current = setTimeout(performAutoSave, 3000);
+  }
+
+  async function performAutoSave() {
+    if (saving || aiGenerating || !session?.accessToken || !hasChanges()) {
+      if (hasChanges()) scheduleAutoSave();
+      return;
+    }
+
+    setAutoSaveStatus("saving");
+    setSaving(true);
+    try {
+      await updateFormClient(session.accessToken, id, {
+        title,
+        description: description || null,
+        questions: questions.length > 0 ? questions : null,
+      });
+      lastSavedRef.current = JSON.stringify({ title, description, questions });
+      setAutoSaveStatus("saved");
+      if (autoSavedStatusRef.current) clearTimeout(autoSavedStatusRef.current);
+      autoSavedStatusRef.current = setTimeout(() => {
+        setAutoSaveStatus((s) => (s === "saved" ? "idle" : s));
+      }, 3000);
+    } catch {
+      setAutoSaveStatus("error");
     } finally {
       setSaving(false);
     }
@@ -355,18 +422,22 @@ export default function EditFormPage({
             >
               <ArrowLeft size={16} />
             </Link>
-            <div className="ml-auto flex items-center gap-3">
-              <button
-                onClick={() => setIsPreview(!isPreview)}
-                title={isPreview ? "Edit" : "Preview"}
-                className="rounded-md p-1.5 text-btn-secondary-text hover:bg-btn-secondary-hover"
-              >
-                {isPreview ? (
-                  <Pencil size={16} />
-                ) : (
-                  <Eye size={16} />
-                )}
-              </button>
+            <div className="ml-auto flex items-center gap-2">
+              {autoSaveStatus === "unsaved" && (
+                <span className="text-xs text-text-placeholder">Unsaved</span>
+              )}
+              {autoSaveStatus === "saving" && (
+                <span className="inline-flex items-center gap-1 text-xs text-text-placeholder">
+                  <Loader size={12} className="animate-spin" />
+                  Saving…
+                </span>
+              )}
+              {autoSaveStatus === "saved" && (
+                <span className="text-xs text-green-600 dark:text-green-400">Saved</span>
+              )}
+              {autoSaveStatus === "error" && (
+                <span className="text-xs text-amber-600 dark:text-amber-400">Save failed</span>
+              )}
               <button
                 onClick={handleSave}
                 disabled={saving}
@@ -416,68 +487,56 @@ export default function EditFormPage({
             </div>
           </div>
 
-          {!isPreview && (
-            <div className="space-y-3">
-              <EditableField
-                value={title}
-                onChange={setTitle}
-                isTextarea
-                className="text-2xl font-bold font-heading text-text-primary"
-                inputClassName="w-full text-2xl font-bold font-heading text-text-primary bg-transparent border-b-2 border-border-input focus:outline-none resize-none py-0.5"
-                placeholder="Form title"
-              />
-              <EditableField
-                value={description}
-                onChange={setDescription}
-                isTextarea
-                className="w-full text-sm text-text-secondary"
-                inputClassName="w-full text-sm text-text-secondary bg-transparent border-b-2 border-border-input focus:outline-none resize-none py-0.5"
-                placeholder="Form description (optional)"
-              />
-            </div>
-          )}
-
-          {isPreview ? (
-            <FormPreview
-              questions={questions}
-              title={title}
-              description={description}
+          <div className="space-y-3">
+            <EditableField
+              value={title}
+              onChange={setTitle}
+              isTextarea
+              className="text-2xl font-bold font-heading text-text-primary"
+              inputClassName="w-full text-2xl font-bold font-heading text-text-primary bg-transparent border-b-2 border-border-input focus:outline-none resize-none py-0.5"
+              placeholder="Form title"
             />
-          ) : (
-            <>
-              <div>
-                {questions.map((question, index) => (
-                  <QuestionCard
-                    key={question.id}
-                    questionIndex={index}
-                    question={question}
-                    onChange={(updated) => handleQuestionChange(index, updated)}
-                    onDelete={() => deleteQuestion(index)}
-                  />
-                ))}
-              </div>
+            <EditableField
+              value={description}
+              onChange={setDescription}
+              isTextarea
+              className="w-full text-sm text-text-secondary"
+              inputClassName="w-full text-sm text-text-secondary bg-transparent border-b-2 border-border-input focus:outline-none resize-none py-0.5"
+              placeholder="Form description (optional)"
+            />
+          </div>
 
-              <button
-                onClick={handleAdd}
-                className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
-              >
-                <Plus size={14} />
-                Add question
-              </button>
-            </>
-          )}
+          <>
+            <div>
+              {questions.map((question, index) => (
+                <QuestionCard
+                  key={question.id}
+                  questionIndex={index}
+                  question={question}
+                  onChange={(updated) => handleQuestionChange(index, updated)}
+                  onDelete={() => deleteQuestion(index)}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={handleAdd}
+              className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
+            >
+              <Plus size={14} />
+              Add question
+            </button>
+          </>
         </div>
       </div>
 
-      {!isPreview && (
-        <AiPromptBar
-          value={prompt}
-          onChange={setPrompt}
-          onSubmit={handleAiSubmit}
-          loading={aiGenerating}
-          disabled={cooldown > 0}
-        />
-      )}
+      <AiPromptBar
+        value={prompt}
+        onChange={setPrompt}
+        onSubmit={handleAiSubmit}
+        loading={aiGenerating}
+        disabled={cooldown > 0}
+      />
     </div>
   );
 }
