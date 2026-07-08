@@ -10,8 +10,8 @@ import { Toast } from "@/components/Toast";
 import { ApiError } from "@/lib/api";
 import { createFormClient, generateQuestionsClient, updateFormClient } from "@/lib/form";
 import type { FormQuestion } from "@/types/form";
-import { ArrowLeft, Loader, Save, Plus } from "lucide-react";
-import { buildEditsSummary, type FormSnapshot } from "@/lib/editTracker";
+import { ArrowLeft, Loader, Save, Plus, X, Sparkles } from "lucide-react";
+import { buildEditsSummary, computeEditCounts, type FormSnapshot } from "@/lib/editTracker";
 
 function EditableField({
   value,
@@ -114,6 +114,7 @@ export default function NewFormPage() {
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "unsaved" | "saving" | "saved" | "error">("idle");
   const autoSavedStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [changeSummary, setChangeSummary] = useState<{ additions: number; removals: number; edits: number } | null>(null);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -259,11 +260,18 @@ export default function NewFormPage() {
           questions: questions.filter(q => q.text.trim()),
         },
       );
-      setQuestions(res.data.questions);
+      const generatedQuestions = res.data.questions;
+      setQuestions(generatedQuestions);
       if (res.data.title !== undefined) setTitle(res.data.title ?? "");
       if (res.data.description !== undefined) setDescription(res.data.description ?? "");
       const newConversationId = res.conversation_id ?? null;
       setConversationId(newConversationId);
+      const afterSnapshot: FormSnapshot = {
+        title: res.data.title ?? title,
+        description: res.data.description ?? description,
+        questions: generatedQuestions,
+      };
+      setChangeSummary(computeEditCounts(prevFormSnapshotRef.current, afterSnapshot));
       if (newConversationId) {
         if (!conversationId) {
           try {
@@ -282,12 +290,12 @@ export default function NewFormPage() {
       lastSavedRef.current = JSON.stringify({
         title: res.data.title ?? title,
         description: res.data.description ?? description,
-        questions: res.data.questions,
+        questions: generatedQuestions,
       });
       prevFormSnapshotRef.current = {
         title: res.data.title ?? "",
         description: res.data.description ?? "",
-        questions: JSON.parse(JSON.stringify(res.data.questions)),
+        questions: JSON.parse(JSON.stringify(generatedQuestions)),
       };
       setPrompt("");
     } catch (err) {
@@ -421,6 +429,24 @@ export default function NewFormPage() {
           </>
         </div>
       </div>
+
+      {changeSummary && (
+        <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2">
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs text-text-secondary shadow-sm">
+            <Sparkles size={12} className="shrink-0" />
+            <span>
+              {[
+                changeSummary.additions > 0 && `${changeSummary.additions} ${changeSummary.additions === 1 ? "addition" : "additions"}`,
+                changeSummary.removals > 0 && `${changeSummary.removals} ${changeSummary.removals === 1 ? "removal" : "removals"}`,
+                changeSummary.edits > 0 && `${changeSummary.edits} ${changeSummary.edits === 1 ? "edit" : "edits"}`,
+              ].filter(Boolean).join(" · ")}
+            </span>
+            <button onClick={() => setChangeSummary(null)} className="text-text-placeholder hover:text-text-secondary">
+              <X size={12} />
+            </button>
+          </div>
+        </div>
+      )}
 
       <AiPromptBar value={prompt} onChange={setPrompt} onSubmit={handleAiSubmit} loading={aiGenerating} disabled={cooldown > 0} />
     </div>

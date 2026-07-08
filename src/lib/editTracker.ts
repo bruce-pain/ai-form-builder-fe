@@ -51,6 +51,36 @@ function diffQuestion(before: FormQuestion, after: FormQuestion): string[] {
   return edits;
 }
 
+export function computeEditCounts(
+  before: FormSnapshot,
+  after: FormSnapshot,
+): { additions: number; removals: number; edits: number } {
+  let additions = 0;
+  let removals = 0;
+  let edits = 0;
+
+  for (const aq of after.questions) {
+    if (!before.questions.find((q) => q.id === aq.id)) {
+      additions++;
+    }
+  }
+
+  for (const bq of before.questions) {
+    if (!after.questions.find((q) => q.id === bq.id)) {
+      removals++;
+    }
+  }
+
+  for (const aq of after.questions) {
+    const bq = before.questions.find((q) => q.id === aq.id);
+    if (bq && diffQuestion(bq, aq).length > 0) {
+      edits++;
+    }
+  }
+
+  return { additions, removals, edits };
+}
+
 export function buildEditsSummary(
   before: FormSnapshot,
   after: FormSnapshot,
