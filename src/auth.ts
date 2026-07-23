@@ -95,12 +95,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
 
       if (token.expiresAt && Date.now() / 1000 >= token.expiresAt - 60) {
+        if (!token.refreshToken) {
+          await signOut({ redirect: false });
+          token.accessToken = null;
+          token.refreshToken = null;
+          return token;
+        }
+
         const refreshed = await refreshAccessToken(token);
         if (refreshed) {
           token.accessToken = refreshed.accessToken;
           token.refreshToken = refreshed.refreshToken;
           token.expiresAt = refreshed.expiresAt;
         } else {
+          await signOut({ redirect: false });
           token.accessToken = null;
           token.refreshToken = null;
         }
