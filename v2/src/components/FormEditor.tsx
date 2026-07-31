@@ -36,7 +36,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { ApiError } from "@/lib/api";
-import { buildEditsSummary, type FormSnapshot } from "@/lib/editTracker";
+import {
+  buildEditsSummary,
+  computeAiTouchedIds,
+  type FormSnapshot,
+} from "@/lib/editTracker";
 import {
   createForm,
   deleteForm,
@@ -99,6 +103,7 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
     },
   ]);
   const [activeCardId, setActiveCardId] = useState<string>(TITLE_CARD_ID);
+  const [aiTouchedIds, setAiTouchedIds] = useState<Set<string>>(new Set());
   const [prompt, setPrompt] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [formId, setFormId] = useState<string | undefined>(initialFormId);
@@ -218,12 +223,24 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
       copy[index] = updated;
       return copy;
     });
+    setAiTouchedIds((prev) => {
+      if (!prev.has(updated.id)) return prev;
+      const next = new Set(prev);
+      next.delete(updated.id);
+      return next;
+    });
     setSaveStatus("unsaved");
   }
 
   function handleDeleteQuestion(index: number) {
     const wasActive = questions[index]?.id === activeCardId;
     setQuestions((prev) => prev.filter((_, i) => i !== index));
+    setAiTouchedIds((prev) => {
+      if (!prev.has(questions[index]?.id ?? "")) return prev;
+      const next = new Set(prev);
+      next.delete(questions[index]!.id);
+      return next;
+    });
     if (wasActive) {
       setActiveCardId(
         questions[index + 1]?.id ?? questions[index - 1]?.id ?? TITLE_CARD_ID,
@@ -265,6 +282,13 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
 
       setQuestions(generatedQuestions);
       syncIdCounter(generatedQuestions);
+      setAiTouchedIds(
+        computeAiTouchedIds(currentSnapshot, {
+          title: nextTitle,
+          description: nextDescription,
+          questions: generatedQuestions,
+        }),
+      );
       setTitle(nextTitle);
       setDescription(nextDescription);
       setConversationId(newConversationId);
@@ -516,6 +540,7 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
         <QuestionList
           questions={questions}
           activeCardId={activeCardId === TITLE_CARD_ID ? null : activeCardId}
+          aiTouchedIds={aiTouchedIds}
           onQuestionChange={handleQuestionChange}
           onDelete={handleDeleteQuestion}
           onAdd={handleAddQuestion}

@@ -83,6 +83,20 @@ export function computeEditCounts(
   return { additions, removals, edits };
 }
 
+export function computeAiTouchedIds(
+  before: FormSnapshot,
+  after: FormSnapshot,
+): Set<string> {
+  const touched = new Set<string>();
+  for (const aq of after.questions) {
+    const bq = before.questions.find((q) => q.id === aq.id);
+    if (!bq || diffQuestion(bq, aq).length > 0) {
+      touched.add(aq.id);
+    }
+  }
+  return touched;
+}
+
 export function buildEditsSummary(
   before: FormSnapshot,
   after: FormSnapshot,

@@ -12,6 +12,7 @@ type FormQuestionInput = components["schemas"]["FormQuestionInput"];
 interface QuestionListProps {
   questions: FormQuestionInput[];
   activeCardId: string | null;
+  aiTouchedIds: Set<string>;
   onQuestionChange: (index: number, updated: FormQuestionInput) => void;
   onDelete: (index: number) => void;
   onAdd: () => void;
@@ -21,6 +22,7 @@ interface QuestionListProps {
 export function QuestionList({
   questions,
   activeCardId,
+  aiTouchedIds,
   onQuestionChange,
   onDelete,
   onAdd,
@@ -32,6 +34,7 @@ export function QuestionList({
         <QuestionCard
           key={question.id}
           active={activeCardId === question.id}
+          aiTouched={aiTouchedIds.has(question.id)}
           question={question}
           index={index}
           onChange={(updated) => onQuestionChange(index, updated)}

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Sparkles, Trash2, X } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +23,7 @@ type FormQuestionInput = components["schemas"]["FormQuestionInput"];
 
 interface QuestionCardProps {
   active: boolean;
+  aiTouched: boolean;
   question: FormQuestionInput;
   index: number;
   onChange: (updated: FormQuestionInput) => void;
@@ -32,6 +34,7 @@ interface QuestionCardProps {
 
 export function QuestionCard({
   active,
+  aiTouched,
   question,
   index,
   onChange,
@@ -83,9 +86,17 @@ export function QuestionCard({
     return (
       <div className="rounded-xl border bg-card p-5 ring-2 ring-primary shadow-md">
         <div className="mb-4 flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground">
-            Question {index + 1}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">
+              Question {index + 1}
+            </span>
+            {aiTouched && (
+              <Badge className="border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800 dark:bg-violet-950/30 dark:text-violet-400">
+                <Sparkles className="size-3" />
+                New
+              </Badge>
+            )}
+          </div>
           {!isOnly && (
             <Button variant="ghost" size="icon-sm" onClick={onDelete}>
               <Trash2 className="size-4" />
@@ -190,9 +201,17 @@ export function QuestionCard({
       className="cursor-pointer rounded-xl border bg-card p-5 transition-colors hover:bg-muted/50"
     >
       <div className="mb-3">
-        <span className="text-xs font-medium text-muted-foreground">
-          Question {index + 1}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">
+            Question {index + 1}
+          </span>
+          {aiTouched && (
+            <Badge className="border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800 dark:bg-violet-950/30 dark:text-violet-400">
+              <Sparkles className="size-3" />
+              New
+            </Badge>
+          )}
+        </div>
       </div>
 
       <p className="mb-3 text-sm font-medium">
