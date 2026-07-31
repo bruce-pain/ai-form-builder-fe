@@ -8,12 +8,12 @@ export class ApiError extends Error {
 
 async function request(path: string, init?: RequestInit) {
   const res = await fetch(`${BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...init?.headers },
     ...init,
+    headers: { "Content-Type": "application/json", ...init?.headers },
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, body.detail || `Request failed`);
+    throw new ApiError(res.status, body.detail || body.message || `Request failed`);
   }
   return res.json();
 }
