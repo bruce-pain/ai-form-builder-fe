@@ -222,12 +222,20 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
   }
 
   function handleDeleteQuestion(index: number) {
+    const wasActive = questions[index]?.id === activeCardId;
     setQuestions((prev) => prev.filter((_, i) => i !== index));
+    if (wasActive) {
+      setActiveCardId(
+        questions[index + 1]?.id ?? questions[index - 1]?.id ?? TITLE_CARD_ID,
+      );
+    }
     setSaveStatus("unsaved");
   }
 
   function handleAddQuestion() {
-    setQuestions((prev) => [...prev, createBlankQuestion()]);
+    const question = createBlankQuestion();
+    setQuestions((prev) => [...prev, question]);
+    setActiveCardId(question.id);
     setSaveStatus("unsaved");
   }
 
