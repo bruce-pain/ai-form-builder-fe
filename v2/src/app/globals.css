@@ -131,3 +131,28 @@
     @apply font-sans;
   }
 }
+
+@layer utilities {
+  .scrollbar-hover {
+    scrollbar-width: auto;
+    scrollbar-color: transparent transparent;
+  }
+  .scrollbar-hover:hover {
+    scrollbar-color: var(--border) transparent;
+  }
+  .scrollbar-hover::-webkit-scrollbar {
+    width: 12px;
+  }
+  .scrollbar-hover::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-hover::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  .scrollbar-hover:hover::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+  }
+}
