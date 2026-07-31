@@ -1,7 +1,5 @@
-import { apiFetch, ApiError } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
 import type { components } from "@/lib/api.types";
-
-const BASE = process.env.NEXT_PUBLIC_API_URL;
 
 type FormCreateRequest = components["schemas"]["FormCreateRequest"];
 type FormUpdateRequest = components["schemas"]["FormUpdateRequest"];
@@ -33,15 +31,7 @@ export async function updateForm(token: string, id: string, data: FormUpdateRequ
 }
 
 export async function deleteForm(token: string, id: string): Promise<void> {
-  const res = await fetch(`${BASE}/api/v1/forms/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, body.detail || `Request failed`);
-  }
+  await apiFetch(`/api/v1/forms/${id}`, token, { method: "DELETE" });
 }
 
 export async function generateQuestions(

@@ -13,7 +13,7 @@ type FormData = components["schemas"]["FormListResponseData"];
 
 export default async function DashboardPage() {
   const session = await auth();
-  if (!session) redirect("/login");
+  if (!session?.accessToken) redirect("/api/auth/expired");
 
   const { data: forms }: { data: FormData[] } = await apiFetch(
     "/api/v1/forms",
