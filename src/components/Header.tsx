@@ -1,30 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { signOut, useSession } from "next-auth/react";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
 
-export function Header() {
-  const { data: session } = useSession();
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
+export function Header() {
   return (
-    <header className="py-3">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
-        <Link href="/dashboard" className="text-lg font-bold text-text-primary">
+    <header className="sticky top-0 z-10 border-b bg-background/80 px-4 py-3 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-5xl items-center justify-between">
+        <Link
+          href="/dashboard"
+          className="text-base font-medium tracking-tight"
+        >
           AI Form Builder
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <ThemeToggle />
-          {session && (
-            <button
-              onClick={() => signOut()}
-              title="Sign out"
-              className="flex size-9 items-center justify-center rounded-full text-btn-secondary-text transition-colors hover:bg-btn-secondary-hover"
-            >
-              <LogOut size={20} />
-            </button>
-          )}
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => signOut()}
+            title="Sign out"
+          >
+            <LogOut />
+          </Button>
         </div>
       </div>
     </header>

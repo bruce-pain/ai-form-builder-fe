@@ -1,52 +1,56 @@
 "use client";
 
-import { useState } from "react";
-import { Share2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, Copy } from "lucide-react";
+import { toast } from "sonner";
 
-export function ShareButton({ formId }: { formId: string }) {
+import { Button } from "@/components/ui/button";
+
+interface ShareButtonProps {
+  formId: string;
+  label?: string;
+  variant?: "default" | "outline";
+  size?: "default" | "sm" | "lg";
+  className?: string;
+}
+
+export function ShareButton({
+  formId,
+  label = "Share",
+  variant = "outline",
+  size = "default",
+  className,
+}: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  function copyToClipboard(text: string) {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
-    } else {
-      fallbackCopy(text);
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
+
+  async function handleCopy() {
+    const publicLink = `${window.location.origin}/forms/public/${formId}`;
+    try {
+      await navigator.clipboard.writeText(publicLink);
+      setCopied(true);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Failed to copy link");
     }
   }
 
-  function fallbackCopy(text: string) {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.style.position = "fixed";
-    textarea.style.opacity = "0";
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-      document.execCommand("copy");
-    } catch {}
-    document.body.removeChild(textarea);
-  }
-
-  function handleClick(e: React.MouseEvent) {
-    e.stopPropagation();
-    e.preventDefault();
-    const url = `${window.location.origin}/forms/public/${formId}`;
-    copyToClipboard(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
   return (
-    <button
-      onClick={handleClick}
-      title="Copy public link"
-      className="rounded-md p-1.5 text-text-placeholder hover:bg-btn-secondary-hover hover:text-text-secondary"
+    <Button
+      variant={variant}
+      size={size}
+      className={className}
+      onClick={handleCopy}
     >
-      {copied ? (
-        <span className="text-xs font-medium">Copied!</span>
-      ) : (
-        <Share2 size={16} />
-      )}
-    </button>
+      {copied ? <Check /> : <Copy />}
+      {copied ? "Copied!" : label}
+    </Button>
   );
 }

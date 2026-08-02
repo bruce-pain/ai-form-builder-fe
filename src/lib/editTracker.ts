@@ -1,12 +1,14 @@
-import type { FormQuestion } from "@/types/form";
+import type { components } from "@/lib/api.types";
+
+type FormQuestionInput = components["schemas"]["FormQuestionInput"];
 
 export interface FormSnapshot {
   title: string;
   description: string;
-  questions: FormQuestion[];
+  questions: FormQuestionInput[];
 }
 
-function diffQuestion(before: FormQuestion, after: FormQuestion): string[] {
+function diffQuestion(before: FormQuestionInput, after: FormQuestionInput): string[] {
   const edits: string[] = [];
   const label = after.text.trim() || before.text.trim() || "a question";
 
@@ -79,6 +81,20 @@ export function computeEditCounts(
   }
 
   return { additions, removals, edits };
+}
+
+export function computeAiTouchedIds(
+  before: FormSnapshot,
+  after: FormSnapshot,
+): Set<string> {
+  const touched = new Set<string>();
+  for (const aq of after.questions) {
+    const bq = before.questions.find((q) => q.id === aq.id);
+    if (!bq || diffQuestion(bq, aq).length > 0) {
+      touched.add(aq.id);
+    }
+  }
+  return touched;
 }
 
 export function buildEditsSummary(
