@@ -86,7 +86,7 @@ export function QuestionCard({
 
   if (active) {
     return (
-      <div className="rounded-xl border bg-card p-5 ring-2 ring-primary shadow-md">
+      <div className="rounded-md border bg-card p-5 ring-2 ring-primary shadow-md">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-muted-foreground">
@@ -200,7 +200,7 @@ export function QuestionCard({
   return (
     <div
       onClick={onActivate}
-      className="cursor-pointer rounded-xl border bg-card p-5 transition-colors hover:bg-muted/50"
+      className="cursor-pointer rounded-md border bg-card p-5 transition-colors hover:bg-muted/50"
     >
       <div className="mb-3">
         <div className="flex items-center gap-2">

@@ -21,7 +21,7 @@ export function TitleCard({
 }: TitleCardProps) {
   if (active) {
     return (
-      <div className="rounded-xl border bg-card p-5 ring-2 ring-primary shadow-md">
+      <div className="rounded-md border bg-card p-5 ring-2 ring-primary shadow-md">
         <div className="space-y-3">
           <UnderlineTextarea
             value={title}
@@ -50,7 +50,7 @@ export function TitleCard({
   return (
     <div
       onClick={onActivate}
-      className="cursor-pointer rounded-xl border bg-card p-5 transition-colors hover:bg-muted/50"
+      className="cursor-pointer rounded-md border bg-card p-5 transition-colors hover:bg-muted/50"
     >
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">
