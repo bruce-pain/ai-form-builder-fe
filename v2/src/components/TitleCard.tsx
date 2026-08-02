@@ -1,7 +1,6 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { UnderlineTextarea } from "@/components/ui/underline-input";
 
 interface TitleCardProps {
   active: boolean;
@@ -24,18 +23,24 @@ export function TitleCard({
     return (
       <div className="rounded-xl border bg-card p-5 ring-2 ring-primary shadow-md">
         <div className="space-y-3">
-          <Input
+          <UnderlineTextarea
             value={title}
             onChange={(e) => onTitleChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                e.currentTarget.blur();
+              }
+            }}
             placeholder="Form title"
-            className="h-9 text-lg font-semibold"
+            rows={1}
+            className="min-h-11 py-1 text-2xl font-semibold tracking-tight md:text-2xl"
           />
-          <Textarea
+          <UnderlineTextarea
             value={description}
             onChange={(e) => onDescriptionChange(e.target.value)}
             placeholder="Form description (optional)"
-            className="min-h-[3rem] resize-none text-sm"
-            rows={2}
+            className="py-1 text-sm"
           />
         </div>
       </div>

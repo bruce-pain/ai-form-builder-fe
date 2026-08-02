@@ -5,7 +5,6 @@ import { Plus, Sparkles, Trash2, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -15,7 +14,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  UnderlineInput,
+  UnderlineTextarea,
+} from "@/components/ui/underline-input";
 
 import type { components } from "@/lib/api.types";
 
@@ -105,11 +107,11 @@ export function QuestionCard({
         </div>
 
         <div className="space-y-4">
-          <Textarea
+          <UnderlineTextarea
             value={question.text}
             onChange={(e) => onChange({ ...question, text: e.target.value })}
             placeholder="Enter your question..."
-            className="min-h-[2.5rem] resize-none text-sm"
+            className="resize-none text-sm"
             rows={1}
           />
 
@@ -172,7 +174,7 @@ export function QuestionCard({
                 </div>
               ))}
               <div className="flex items-center gap-2">
-                <Input
+                <UnderlineInput
                   value={newOption}
                   onChange={(e) => setNewOption(e.target.value)}
                   onKeyDown={(e) => {
@@ -226,7 +228,7 @@ export function QuestionCard({
       </p>
 
       {question.answer_type === "text" ? (
-        <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground/60">
+        <div className="border-b border-input pb-1.5 text-sm text-muted-foreground/60">
           Your answer
         </div>
       ) : (
@@ -245,7 +247,7 @@ export function QuestionCard({
               </div>
             ))
           ) : (
-            <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm text-muted-foreground/60">
+            <div className="border-b border-input pb-1.5 text-sm text-muted-foreground/60">
               No options configured
             </div>
           )}
