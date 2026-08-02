@@ -1,22 +1,18 @@
 import type { Metadata } from "next";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "@/components/SessionProvider";
-import { Analytics } from "@vercel/analytics/next";
-import { Bricolage_Grotesque, Outfit } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const bricolageGrotesque = Bricolage_Grotesque({
-  weight: ["400", "500"],
+const inter = Inter({
   subsets: ["latin"],
-  display: "swap",
-  variable: "--font-heading",
+  variable: "--font-inter",
 });
 
-const outfit = Outfit({
-  weight: ["400", "500"],
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  display: "swap",
-  variable: "--font-body",
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -30,11 +26,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${bricolageGrotesque.variable} ${outfit.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <SessionProvider>{children}</SessionProvider>
-          <Analytics />
+          <SessionProvider>
+            {children}
+            <Toaster />
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

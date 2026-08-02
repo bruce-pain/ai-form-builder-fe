@@ -1,66 +1,68 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import type { FormQuestion } from "@/types/form";
-import { ChevronDown, X, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Plus, Sparkles, Trash2, X } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import {
+  UnderlineInput,
+  UnderlineTextarea,
+} from "@/components/ui/underline-input";
+
+import type { components } from "@/lib/api.types";
+
+type FormQuestionInput = components["schemas"]["FormQuestionInput"];
 
 interface QuestionCardProps {
-  questionIndex: number;
-  question: FormQuestion;
-  onChange: (updated: FormQuestion) => void;
+  active: boolean;
+  aiTouched: boolean;
+  question: FormQuestionInput;
+  index: number;
+  onChange: (updated: FormQuestionInput) => void;
   onDelete: () => void;
-}
-
-function Toggle({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <label className="flex cursor-pointer items-center gap-2">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="sr-only"
-      />
-      <div
-        className={`relative h-4 w-8 rounded-full transition-colors ${
-          checked ? "bg-toggle-active" : "bg-toggle-bg"
-        }`}
-      >
-        <div
-          className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-toggle-dot transition-transform ${
-            checked ? "translate-x-4" : "translate-x-0"
-          }`}
-        />
-      </div>
-      <span className="text-sm text-text-secondary">{label}</span>
-    </label>
-  );
+  onActivate: () => void;
+  isOnly: boolean;
 }
 
 export function QuestionCard({
-  questionIndex,
+  active,
+  aiTouched,
   question,
+  index,
   onChange,
   onDelete,
+  onActivate,
+  isOnly,
 }: QuestionCardProps) {
   const [newOption, setNewOption] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  function autoResize(el: HTMLTextAreaElement) {
-    el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
+  function handleAnswerTypeChange(value: string) {
+    if (value === "text") {
+      onChange({
+        ...question,
+        answer_type: "text",
+        answer_select_options: null,
+        answer_select_multiple: null,
+      });
+    } else {
+      onChange({
+        ...question,
+        answer_type: "select",
+        answer_select_options: [],
+        answer_select_multiple: false,
+      });
+    }
   }
-
-  useEffect(() => {
-    if (textareaRef.current) autoResize(textareaRef.current);
-  }, [question.text]);
 
   function addOption() {
     const trimmed = newOption.trim();
@@ -82,82 +84,97 @@ export function QuestionCard({
     });
   }
 
-  return (
-    <div className="py-8">
-      <div className="flex items-start gap-3">
-        <span className="shrink-0 pt-0.5 text-right text-sm text-text-placeholder">
-          {String(questionIndex + 1).padStart(2, "0")}
-        </span>
-        <div className="min-w-0 flex-1 space-y-4">
-          <textarea
-            ref={textareaRef}
+  if (active) {
+    return (
+      <div className="rounded-md border bg-card p-5 ring-2 ring-primary shadow-md">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">
+              Question {index + 1}
+            </span>
+            {aiTouched && (
+              <Badge className="border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800 dark:bg-violet-950/30 dark:text-violet-400">
+                <Sparkles className="size-3" />
+                New
+              </Badge>
+            )}
+          </div>
+          {!isOnly && (
+            <Button variant="ghost" size="icon-sm" onClick={onDelete}>
+              <Trash2 className="size-4" />
+            </Button>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <UnderlineTextarea
             value={question.text}
             onChange={(e) => onChange({ ...question, text: e.target.value })}
-            onInput={(e) => autoResize(e.currentTarget)}
             placeholder="Enter your question..."
-            className="w-full resize-none overflow-hidden border-b border-border bg-transparent pb-1 text-sm text-text-primary placeholder-text-placeholder focus:border-gray-400 focus:outline-none"
+            className="resize-none text-sm"
+            rows={1}
           />
 
           <div className="flex flex-wrap items-center gap-4">
-            <div className="relative">
-              <select
+            <div className="flex items-center gap-2">
+              <Label className="text-xs text-muted-foreground">
+                Answer type
+              </Label>
+              <Select
                 value={question.answer_type}
-                onChange={(e) =>
-                  onChange({
-                    ...question,
-                    answer_type: e.target.value as "text" | "select",
-                    answer_select_options:
-                      e.target.value === "text" ? null : [],
-                    answer_select_multiple:
-                      e.target.value === "text" ? null : false,
-                  })
-                }
-                className="appearance-none bg-transparent pr-5 text-sm text-text-secondary focus:outline-none"
+                onValueChange={handleAnswerTypeChange}
               >
-                <option value="text">Text</option>
-                <option value="select">Select</option>
-              </select>
-              <ChevronDown size={12} className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-text-placeholder" />
+                <SelectTrigger className="h-7 w-24 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="text">Text</SelectItem>
+                  <SelectItem value="select">Select</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            {question.answer_type === "select" && (
-              <Toggle
-                label="Allow multiple"
-                checked={question.answer_select_multiple ?? false}
-                onChange={(v) =>
-                  onChange({ ...question, answer_select_multiple: v })
-                }
+            <Label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Switch
+                checked={question.required}
+                onCheckedChange={(v) => onChange({ ...question, required: v })}
+                size="sm"
               />
-            )}
+              Required
+            </Label>
 
-            <Toggle
-              label="Required"
-              checked={question.required}
-              onChange={(v) => onChange({ ...question, required: v })}
-            />
+            {question.answer_type === "select" && (
+              <Label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Switch
+                  checked={question.answer_select_multiple ?? false}
+                  onCheckedChange={(v) =>
+                    onChange({ ...question, answer_select_multiple: v })
+                  }
+                  size="sm"
+                />
+                Allow multiple
+              </Label>
+            )}
           </div>
 
           {question.answer_type === "select" && (
-            <div>
-              {question.answer_select_options &&
-                question.answer_select_options.map((option) => (
-                  <div
-                    key={option}
-                    className="flex items-center justify-between border-b border-border py-2"
+            <div className="space-y-2">
+              {(question.answer_select_options ?? []).map((option) => (
+                <div
+                  key={option}
+                  className="flex items-center justify-between rounded-lg border px-3 py-2"
+                >
+                  <span className="text-sm">{option}</span>
+                  <button
+                    onClick={() => removeOption(option)}
+                    className="text-muted-foreground hover:text-foreground"
                   >
-                    <span className="text-sm text-text-primary">{option}</span>
-                    <button
-                      onClick={() => removeOption(option)}
-                      className="text-text-placeholder hover:text-text-secondary"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                ))}
-              <div className="flex items-center gap-2 border-b border-border py-2">
-                <Plus size={14} className="shrink-0 text-text-placeholder" />
-                <input
-                  type="text"
+                    <X className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+              <div className="flex items-center gap-2">
+                <UnderlineInput
                   value={newOption}
                   onChange={(e) => setNewOption(e.target.value)}
                   onKeyDown={(e) => {
@@ -167,21 +184,75 @@ export function QuestionCard({
                     }
                   }}
                   placeholder="Add option..."
-                  className="flex-1 bg-transparent text-sm text-text-primary placeholder-text-placeholder focus:outline-none"
+                  className="h-8 text-sm"
                 />
+                <Button variant="outline" size="icon-sm" onClick={addOption}>
+                  <Plus className="size-3.5" />
+                </Button>
               </div>
             </div>
           )}
         </div>
-
-        <button
-          onClick={onDelete}
-          className="shrink-0 rounded-md p-1.5 text-text-placeholder hover:bg-btn-secondary-hover hover:text-text-secondary"
-          title="Delete question"
-        >
-          <Trash2 size={16} />
-        </button>
       </div>
+    );
+  }
+
+  return (
+    <div
+      onClick={onActivate}
+      className="cursor-pointer rounded-md border bg-card p-5 transition-colors hover:bg-muted/50"
+    >
+      <div className="mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">
+            Question {index + 1}
+          </span>
+          {aiTouched && (
+            <Badge className="border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800 dark:bg-violet-950/30 dark:text-violet-400">
+              <Sparkles className="size-3" />
+              New
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      <p className="mb-3 text-sm font-medium">
+        {question.text || (
+          <span className="italic text-muted-foreground/50">
+            Untitled question
+          </span>
+        )}
+        {question.required && (
+          <span className="ml-0.5 text-destructive">*</span>
+        )}
+      </p>
+
+      {question.answer_type === "text" ? (
+        <div className="border-b border-input pb-1.5 text-sm text-muted-foreground/60">
+          Your answer
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          {(question.answer_select_options ?? []).length > 0 ? (
+            (question.answer_select_options ?? []).map((option) => (
+              <div key={option} className="flex items-center gap-2">
+                <div
+                  className={`shrink-0 border border-muted-foreground/30 ${
+                    question.answer_select_multiple
+                      ? "size-4 rounded-sm"
+                      : "size-4 rounded-full"
+                  }`}
+                />
+                <span className="text-sm text-muted-foreground">{option}</span>
+              </div>
+            ))
+          ) : (
+            <div className="border-b border-input pb-1.5 text-sm text-muted-foreground/60">
+              No options configured
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

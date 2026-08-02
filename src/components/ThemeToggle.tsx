@@ -2,7 +2,9 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { Sun, Moon } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -11,20 +13,17 @@ export function ThemeToggle() {
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
-    return <div className="size-9" />;
+    return <div className="size-7" />;
   }
 
   return (
-    <button
+    <Button
+      variant="outline"
+      size="icon-sm"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-black/5 dark:hover:bg-white/10"
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >
-      {theme === "dark" ? (
-        <Sun size={20} />
-      ) : (
-        <Moon size={20} />
-      )}
-    </button>
+      {theme === "dark" ? <Sun /> : <Moon />}
+    </Button>
   );
 }

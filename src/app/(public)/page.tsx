@@ -1,43 +1,35 @@
-"use client";
-
-import { useSession } from "next-auth/react";
+import { auth } from "@/auth";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function Home() {
-  const { data: session } = useSession();
+export default async function HomePage() {
+  const session = await auth();
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-10 p-8">
-      <div className="flex max-w-md flex-col items-center gap-6 text-center">
-        <span className="text-sm font-medium uppercase tracking-[0.15em] text-text-placeholder">
-          AI Form Builder
-        </span>
-        <h1 className="text-5xl font-heading text-text-primary leading-tight">
-          Describe your form.
-          <br />
-          AI builds it. You refine it.
-        </h1>
-        <p className="text-base text-text-secondary leading-relaxed">
-          Keep the parts you like, change the rest, all through the same
-          conversation.
-        </p>
+    <main className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
+      <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+        Describe your form. AI builds it.
+      </h1>
+      <p className="mt-4 max-w-md text-muted-foreground">
+        Type what you need in plain English. The AI generates questions, you
+        refine with chat. No drag-and-drop required.
+      </p>
+      <div className="mt-8 flex gap-4">
+        {session ? (
+          <Button asChild>
+            <Link href="/dashboard">Go to dashboard</Link>
+          </Button>
+        ) : (
+          <>
+            <Button asChild>
+              <Link href="/register">Get started</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/login">Log in</Link>
+            </Button>
+          </>
+        )}
       </div>
-
-      {session ? (
-        <Link
-          href="/dashboard"
-          className="rounded-lg bg-btn-primary px-6 py-3 text-base font-medium text-btn-primary-text hover:bg-btn-primary-hover"
-        >
-          Go to dashboard
-        </Link>
-      ) : (
-        <Link
-          href="/login"
-          className="rounded-lg bg-btn-primary px-6 py-3 text-base font-medium text-btn-primary-text hover:bg-btn-primary-hover"
-        >
-          Log in
-        </Link>
-      )}
-    </div>
+    </main>
   );
 }

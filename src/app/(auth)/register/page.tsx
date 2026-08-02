@@ -4,16 +4,30 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/register`,
@@ -25,6 +39,7 @@ export default function RegisterPage() {
     );
 
     if (!res.ok) {
+      setLoading(false);
       setError("Registration failed. Email may be invalid or already taken.");
       return;
     }
@@ -35,6 +50,8 @@ export default function RegisterPage() {
       redirect: false,
     });
 
+    setLoading(false);
+
     if (result?.error) {
       setError("Account created but sign in failed. Please log in.");
       return;
@@ -44,70 +61,52 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-8">
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-sm flex-col gap-6"
-      >
-        <h1 className="text-3xl font-bold font-heading text-text-primary">
-          Sign up
-        </h1>
-
-        <div className="flex flex-col gap-2">
-          <label
-            htmlFor="email"
-            className="text-sm font-medium text-text-primary"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="bg-transparent border-b-2 border-border-input px-0 py-1.5 text-text-primary outline-none transition-colors focus:border-gray-400"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-text-primary"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="bg-transparent border-b-2 border-border-input px-0 py-1.5 text-text-primary outline-none transition-colors focus:border-gray-400"
-          />
-        </div>
-
-        {error && (
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-        )}
-
-        <button
-          type="submit"
-          className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-text hover:bg-btn-primary-hover"
-        >
-          Sign up
-        </button>
-
-        <p className="text-center text-sm text-text-primary">
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle>Sign up</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="you@example.com"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="Create a password"
+            />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading && <Loader2 className="animate-spin" />}
+            {loading ? "Signing up..." : "Sign up"}
+          </Button>
+        </form>
+      </CardContent>
+      <CardFooter className="justify-center">
+        <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-medium underline underline-offset-2"
+            className="font-medium text-primary underline-offset-4 hover:underline"
           >
             Log in
           </Link>
         </p>
-      </form>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }
