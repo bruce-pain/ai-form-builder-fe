@@ -200,8 +200,8 @@ export default function FormDetailPage({
         setResponses(
           [...responsesRes.data].sort(
             (a, b) =>
-              new Date(a.created_at).getTime() -
-              new Date(b.created_at).getTime(),
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime(),
           ),
         );
         setLoading(false);
@@ -312,7 +312,7 @@ export default function FormDetailPage({
   }
 
   const responseCount = responses.length;
-  const lastResponse = responses[responseCount - 1]?.created_at;
+  const lastResponse = responses[0]?.created_at;
   const currentResponse = responses[responseIndex] ?? responses[0];
   const publicUrl =
     typeof window !== "undefined"
@@ -452,7 +452,7 @@ export default function FormDetailPage({
           </TabsContent>
 
           <TabsContent value="individual" className="mt-6">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="mb-4 flex flex-wrap items-center gap-1.5">
               <Button
                 variant="outline"
                 size="sm"
@@ -462,8 +462,7 @@ export default function FormDetailPage({
                 <ChevronLeft />
                 Previous
               </Button>
-              <div className="flex flex-1 items-center justify-center gap-1.5 text-sm text-muted-foreground">
-                Response
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Select
                   value={String(responseIndex + 1)}
                   onValueChange={(value) => setResponseIndex(Number(value) - 1)}
