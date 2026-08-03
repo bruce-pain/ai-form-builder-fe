@@ -15,9 +15,25 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-form-builder-fe.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "AI Form Builder",
-  description: "AI-powered form builder",
+  description: "Describe your form. AI builds it.",
+  openGraph: {
+    type: "website",
+    siteName: "AI Form Builder",
+    locale: "en_US",
+    title: "AI Form Builder",
+    description: "Describe your form. AI builds it.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AI Form Builder",
+    description: "Describe your form. AI builds it.",
+  },
 };
 
 export default function RootLayout({
