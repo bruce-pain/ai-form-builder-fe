@@ -185,7 +185,6 @@ export default function FormDetailPage({
     if (!token) return;
     let cancelled = false;
 
-    setLoading(true);
     Promise.all([getForm(token, id), getFormResponses(token, id)])
       .then(([formRes, responsesRes]) => {
         if (cancelled) return;
@@ -220,9 +219,9 @@ export default function FormDetailPage({
     };
   }, [token, id, router]);
 
-  useEffect(() => {
-    if (responseIndex >= responses.length) setResponseIndex(0);
-  }, [responses.length, responseIndex]);
+  if (responses.length > 0 && responseIndex >= responses.length) {
+    setResponseIndex(0);
+  }
 
   const summary = useMemo<SummarySection[]>(() => {
     if (!form) return [];

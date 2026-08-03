@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import type { JWT } from "next-auth/jwt";
 
 function decodeJwtExp(token: string): number {
   try {
@@ -12,7 +13,7 @@ function decodeJwtExp(token: string): number {
   }
 }
 
-async function refreshAccessToken(token: any): Promise<{
+async function refreshAccessToken(token: JWT): Promise<{
   accessToken: string;
   refreshToken: string;
   expiresAt: number;
@@ -80,7 +81,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: { token: any; user?: any }) {
+    async jwt({ token, user }) {
       if (user) {
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
@@ -116,11 +117,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       return token;
     },
-    async session({ session, token }: { session: any; token: any }) {
+    async session({ session, token }) {
       session.accessToken = token.accessToken;
       session.refreshToken = token.refreshToken;
-      session.user.id = token.id;
-      session.user.email = token.email;
+      if (token.id) session.user.id = token.id;
+      if (token.email) session.user.email = token.email;
       return session;
     },
   },

@@ -8,13 +8,17 @@ interface SaveIndicatorProps {
 
 export function SaveIndicator({ status }: SaveIndicatorProps) {
   const [visible, setVisible] = useState(true);
+  const [prevStatus, setPrevStatus] = useState(status);
+
+  if (prevStatus !== status) {
+    setPrevStatus(status);
+    if (status !== "saved") setVisible(true);
+  }
 
   useEffect(() => {
-    if (status === "saved") {
-      const timer = setTimeout(() => setVisible(false), 3000);
-      return () => clearTimeout(timer);
-    }
-    setVisible(true);
+    if (status !== "saved") return;
+    const timer = setTimeout(() => setVisible(false), 3000);
+    return () => clearTimeout(timer);
   }, [status]);
 
   if (!visible && status === "saved") return null;
