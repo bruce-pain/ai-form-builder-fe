@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, type Ref } from "react";
-import { GripHorizontal, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { type Ref } from "react";
+import { GripHorizontal, Sparkles, Trash2 } from "lucide-react";
 
 import type {
   DraggableAttributes,
@@ -18,11 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SelectOptionList } from "@/components/SelectOptionList";
 import { Switch } from "@/components/ui/switch";
-import {
-  UnderlineInput,
-  UnderlineTextarea,
-} from "@/components/ui/underline-input";
+import { UnderlineTextarea } from "@/components/ui/underline-input";
 
 import type { components } from "@/lib/api.types";
 
@@ -57,8 +55,6 @@ export function QuestionCard({
   dragHandleProps,
   dragHandleListeners,
 }: QuestionCardProps) {
-  const [newOption, setNewOption] = useState("");
-
   function handleDragHandleMouseDown(e: React.MouseEvent) {
     e.stopPropagation();
   }
@@ -101,26 +97,6 @@ export function QuestionCard({
         answer_select_multiple: false,
       });
     }
-  }
-
-  function addOption() {
-    const trimmed = newOption.trim();
-    if (!trimmed) return;
-    const options = question.answer_select_options ?? [];
-    if (options.includes(trimmed)) return;
-    onChange({
-      ...question,
-      answer_select_options: [...options, trimmed],
-    });
-    setNewOption("");
-  }
-
-  function removeOption(option: string) {
-    const options = question.answer_select_options ?? [];
-    onChange({
-      ...question,
-      answer_select_options: options.filter((o) => o !== option),
-    });
   }
 
   if (active) {
@@ -202,39 +178,12 @@ export function QuestionCard({
           </div>
 
           {question.answer_type === "select" && (
-            <div className="space-y-2">
-              {(question.answer_select_options ?? []).map((option) => (
-                <div
-                  key={option}
-                  className="flex items-center justify-between rounded-lg border px-3 py-2"
-                >
-                  <span className="text-sm">{option}</span>
-                  <button
-                    onClick={() => removeOption(option)}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <X className="size-3.5" />
-                  </button>
-                </div>
-              ))}
-              <div className="flex items-center gap-2">
-                <UnderlineInput
-                  value={newOption}
-                  onChange={(e) => setNewOption(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addOption();
-                    }
-                  }}
-                  placeholder="Add option..."
-                  className="h-8 text-sm"
-                />
-                <Button variant="outline" size="icon-sm" onClick={addOption}>
-                  <Plus className="size-3.5" />
-                </Button>
-              </div>
-            </div>
+            <SelectOptionList
+              options={question.answer_select_options ?? []}
+              onChange={(opts) =>
+                onChange({ ...question, answer_select_options: opts })
+              }
+            />
           )}
         </div>
       </div>
