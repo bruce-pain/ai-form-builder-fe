@@ -8,12 +8,15 @@ import {
   ArrowLeft,
   Check,
   Copy,
+  Eye,
   Loader2,
   MoreVertical,
+  Pencil,
   Trash2,
 } from "lucide-react";
 
 import { AiPromptBar } from "@/components/AiPromptBar";
+import { FormPreview } from "@/components/FormPreview";
 import { QuestionList } from "@/components/QuestionList";
 import { SaveIndicator } from "@/components/SaveIndicator";
 import { TitleCard } from "@/components/TitleCard";
@@ -103,6 +106,7 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
     },
   ]);
   const [activeCardId, setActiveCardId] = useState<string>(TITLE_CARD_ID);
+  const [mode, setMode] = useState<"edit" | "preview">("edit");
   const [aiTouchedIds, setAiTouchedIds] = useState<Set<string>>(new Set());
   const [prompt, setPrompt] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -468,7 +472,7 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
   }
 
   return (
-    <div className="pb-36">
+    <div className={mode === "preview" ? "pb-12" : "pb-36"}>
       <div className="mx-auto max-w-2xl space-y-6">
         <div className="flex items-center gap-3">
           <Button
@@ -484,7 +488,18 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
 
           {saveStatus && <SaveIndicator status={saveStatus} />}
 
-          <div className="ml-auto flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="ml-auto"
+            onClick={() =>
+              setMode((prev) => (prev === "preview" ? "edit" : "preview"))
+            }
+          >
+            {mode === "preview" ? <Pencil /> : <Eye />}
+            {mode === "preview" ? "Edit" : "Preview"}
+          </Button>
+
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               onClick={handleSave}
@@ -528,38 +543,50 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
           </div>
         </div>
 
-        <TitleCard
-          active={activeCardId === TITLE_CARD_ID}
-          title={title}
-          description={description}
-          onTitleChange={handleTitleChange}
-          onDescriptionChange={handleDescriptionChange}
-          onActivate={() => setActiveCardId(TITLE_CARD_ID)}
-        />
+        {mode === "edit" ? (
+          <>
+            <TitleCard
+              active={activeCardId === TITLE_CARD_ID}
+              title={title}
+              description={description}
+              onTitleChange={handleTitleChange}
+              onDescriptionChange={handleDescriptionChange}
+              onActivate={() => setActiveCardId(TITLE_CARD_ID)}
+            />
 
-        <QuestionList
-          questions={questions}
-          activeCardId={activeCardId === TITLE_CARD_ID ? null : activeCardId}
-          aiTouchedIds={aiTouchedIds}
-          onQuestionChange={handleQuestionChange}
-          onDelete={handleDeleteQuestion}
-          onAdd={handleAddQuestion}
-          onActivate={setActiveCardId}
-        />
+            <QuestionList
+              questions={questions}
+              activeCardId={activeCardId === TITLE_CARD_ID ? null : activeCardId}
+              aiTouchedIds={aiTouchedIds}
+              onQuestionChange={handleQuestionChange}
+              onDelete={handleDeleteQuestion}
+              onAdd={handleAddQuestion}
+              onActivate={setActiveCardId}
+            />
+          </>
+        ) : (
+          <FormPreview
+            title={title}
+            description={description}
+            questions={questions}
+          />
+        )}
       </div>
 
-      <AiPromptBar
-        value={prompt}
-        onChange={setPrompt}
-        onSubmit={handleAiSubmit}
-        loading={aiGenerating}
-        disabled={cooldown > 0}
-        rateLimitMessage={
-          cooldown > 0
-            ? `Too many requests. Try again in ${cooldown} seconds.`
-            : undefined
-        }
-      />
+      {mode === "edit" && (
+        <AiPromptBar
+          value={prompt}
+          onChange={setPrompt}
+          onSubmit={handleAiSubmit}
+          loading={aiGenerating}
+          disabled={cooldown > 0}
+          rateLimitMessage={
+            cooldown > 0
+              ? `Too many requests. Try again in ${cooldown} seconds.`
+              : undefined
+          }
+        />
+      )}
 
       <AlertDialog
         open={confirmPublishOpen}
