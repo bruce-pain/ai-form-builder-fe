@@ -260,6 +260,17 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
     setSaveStatus("unsaved");
   }
 
+  function handleMoveQuestion(fromIndex: number, toIndex: number) {
+    if (fromIndex === toIndex) return;
+    setQuestions((prev) => {
+      const copy = [...prev];
+      const [moved] = copy.splice(fromIndex, 1);
+      copy.splice(toIndex, 0, moved);
+      return copy;
+    });
+    setSaveStatus("unsaved");
+  }
+
   async function handleAiSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!prompt.trim() || aiGenerating) return;
@@ -560,6 +571,7 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
               aiTouchedIds={aiTouchedIds}
               onQuestionChange={handleQuestionChange}
               onDelete={handleDeleteQuestion}
+              onReorder={handleMoveQuestion}
               onAdd={handleAddQuestion}
               onActivate={setActiveCardId}
             />
