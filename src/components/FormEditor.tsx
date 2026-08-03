@@ -260,6 +260,17 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
     setSaveStatus("unsaved");
   }
 
+  function handleMoveQuestion(fromIndex: number, toIndex: number) {
+    if (fromIndex === toIndex) return;
+    setQuestions((prev) => {
+      const copy = [...prev];
+      const [moved] = copy.splice(fromIndex, 1);
+      copy.splice(toIndex, 0, moved);
+      return copy;
+    });
+    setSaveStatus("unsaved");
+  }
+
   async function handleAiSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!prompt.trim() || aiGenerating) return;
@@ -305,23 +316,43 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
         questions: JSON.parse(JSON.stringify(generatedQuestions)),
       };
 
+      const generatedPayload = generatedQuestions.filter((q) => q.text.trim());
+      const generatedSnapshot = JSON.stringify({
+        title: nextTitle,
+        description: nextDescription,
+        questions: generatedQuestions,
+      });
+
       if (!formId) {
         try {
           const created = await createForm(token, {
             title: nextTitle,
             description: nextDescription || "",
-            questions: generatedQuestions.filter((q) => q.text.trim()),
+            questions: generatedPayload,
             conversation_id: newConversationId,
           });
           setFormId(created.data.id);
-          lastSavedRef.current = JSON.stringify({
-            title: nextTitle,
-            description: nextDescription,
-            questions: generatedQuestions,
-          });
+          lastSavedRef.current = generatedSnapshot;
           setSaveStatus("saved");
         } catch {
           setSaveStatus("unsaved");
+        }
+      } else {
+        try {
+          await updateForm(token, formId, {
+            title: nextTitle,
+            description: nextDescription || null,
+            questions: generatedPayload,
+          });
+          lastSavedRef.current = generatedSnapshot;
+          setSaveStatus("saved");
+        } catch (err) {
+          setSaveStatus("unsaved");
+          toast.error(
+            err instanceof ApiError
+              ? err.message
+              : "Failed to save generated changes.",
+          );
         }
       }
     } catch (err) {
@@ -560,6 +591,7 @@ export function FormEditor({ token, formId: initialFormId }: FormEditorProps) {
               aiTouchedIds={aiTouchedIds}
               onQuestionChange={handleQuestionChange}
               onDelete={handleDeleteQuestion}
+              onReorder={handleMoveQuestion}
               onAdd={handleAddQuestion}
               onActivate={setActiveCardId}
             />

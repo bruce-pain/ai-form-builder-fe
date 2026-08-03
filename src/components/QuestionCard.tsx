@@ -1,7 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Sparkles, Trash2, X } from "lucide-react";
+import { type Ref } from "react";
+import { GripHorizontal, Sparkles, Trash2 } from "lucide-react";
+
+import type {
+  DraggableAttributes,
+  DraggableSyntheticListeners,
+} from "@dnd-kit/core";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,11 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SelectOptionList } from "@/components/SelectOptionList";
 import { Switch } from "@/components/ui/switch";
-import {
-  UnderlineInput,
-  UnderlineTextarea,
-} from "@/components/ui/underline-input";
+import { UnderlineTextarea } from "@/components/ui/underline-input";
 
 import type { components } from "@/lib/api.types";
 
@@ -32,6 +35,10 @@ interface QuestionCardProps {
   onDelete: () => void;
   onActivate: () => void;
   isOnly: boolean;
+  isDragging?: boolean;
+  dragHandleRef?: Ref<HTMLButtonElement>;
+  dragHandleProps?: DraggableAttributes;
+  dragHandleListeners?: DraggableSyntheticListeners;
 }
 
 export function QuestionCard({
@@ -43,8 +50,36 @@ export function QuestionCard({
   onDelete,
   onActivate,
   isOnly,
+  isDragging = false,
+  dragHandleRef,
+  dragHandleProps,
+  dragHandleListeners,
 }: QuestionCardProps) {
-  const [newOption, setNewOption] = useState("");
+  function handleDragHandleMouseDown(e: React.MouseEvent) {
+    e.stopPropagation();
+  }
+
+  function handleDragHandleClick(e: React.MouseEvent) {
+    e.stopPropagation();
+  }
+
+  const dragHandle = (
+    <button
+      ref={dragHandleRef}
+      title="Reorder question"
+      className={`-mx-5 -mt-5 mb-3 flex w-[calc(100%+2.5rem)] cursor-grab touch-none items-center justify-center rounded-t-md py-1 text-muted-foreground/50 active:cursor-grabbing ${
+        active
+          ? ""
+          : "pointer-events-none opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 focus-visible:pointer-events-auto focus-visible:opacity-100"
+      }`}
+      {...dragHandleProps}
+      {...dragHandleListeners}
+      onMouseDown={handleDragHandleMouseDown}
+      onClick={handleDragHandleClick}
+    >
+      <GripHorizontal className="size-4" />
+    </button>
+  );
 
   function handleAnswerTypeChange(value: string) {
     if (value === "text") {
@@ -64,29 +99,14 @@ export function QuestionCard({
     }
   }
 
-  function addOption() {
-    const trimmed = newOption.trim();
-    if (!trimmed) return;
-    const options = question.answer_select_options ?? [];
-    if (options.includes(trimmed)) return;
-    onChange({
-      ...question,
-      answer_select_options: [...options, trimmed],
-    });
-    setNewOption("");
-  }
-
-  function removeOption(option: string) {
-    const options = question.answer_select_options ?? [];
-    onChange({
-      ...question,
-      answer_select_options: options.filter((o) => o !== option),
-    });
-  }
-
   if (active) {
     return (
-      <div className="rounded-md border bg-card p-5 ring-2 ring-primary shadow-md">
+      <div
+        className={`rounded-md border bg-card p-5 ring-2 ring-primary shadow-md ${
+          isDragging ? "z-10 opacity-90" : ""
+        }`}
+      >
+        {dragHandle}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-muted-foreground">
@@ -158,39 +178,12 @@ export function QuestionCard({
           </div>
 
           {question.answer_type === "select" && (
-            <div className="space-y-2">
-              {(question.answer_select_options ?? []).map((option) => (
-                <div
-                  key={option}
-                  className="flex items-center justify-between rounded-lg border px-3 py-2"
-                >
-                  <span className="text-sm">{option}</span>
-                  <button
-                    onClick={() => removeOption(option)}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <X className="size-3.5" />
-                  </button>
-                </div>
-              ))}
-              <div className="flex items-center gap-2">
-                <UnderlineInput
-                  value={newOption}
-                  onChange={(e) => setNewOption(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addOption();
-                    }
-                  }}
-                  placeholder="Add option..."
-                  className="h-8 text-sm"
-                />
-                <Button variant="outline" size="icon-sm" onClick={addOption}>
-                  <Plus className="size-3.5" />
-                </Button>
-              </div>
-            </div>
+            <SelectOptionList
+              options={question.answer_select_options ?? []}
+              onChange={(opts) =>
+                onChange({ ...question, answer_select_options: opts })
+              }
+            />
           )}
         </div>
       </div>
@@ -200,8 +193,11 @@ export function QuestionCard({
   return (
     <div
       onClick={onActivate}
-      className="cursor-pointer rounded-md border bg-card p-5 transition-colors hover:bg-muted/50"
+      className={`group cursor-pointer rounded-md border bg-card p-5 transition-colors hover:bg-muted/50 ${
+        isDragging ? "z-10 opacity-90" : ""
+      }`}
     >
+      {dragHandle}
       <div className="mb-3">
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-muted-foreground">
