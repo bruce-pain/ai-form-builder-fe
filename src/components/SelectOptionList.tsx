@@ -30,10 +30,22 @@ interface SelectOptionListProps {
 
 interface SortableOptionRowProps {
   option: string;
+  editing: boolean;
+  onStartEdit: () => void;
+  onCommit: (next: string) => boolean;
+  onCancelEdit: () => void;
   onRemove: (option: string) => void;
 }
 
-function SortableOptionRow({ option, onRemove }: SortableOptionRowProps) {
+function SortableOptionRow({
+  option,
+  editing,
+  onStartEdit,
+  onCommit,
+  onCancelEdit,
+  onRemove,
+}: SortableOptionRowProps) {
+  const [value, setValue] = useState(option);
   const {
     attributes,
     listeners,
@@ -48,6 +60,13 @@ function SortableOptionRow({ option, onRemove }: SortableOptionRowProps) {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  function handleCommit() {
+    const next = value.trim();
+    if (!next || next === option || !onCommit(next)) {
+      setValue(option);
+    }
+  }
 
   return (
     <div
@@ -67,7 +86,35 @@ function SortableOptionRow({ option, onRemove }: SortableOptionRowProps) {
         >
           <GripVertical className="size-3.5" />
         </button>
-        <span className="truncate text-sm">{option}</span>
+        {editing ? (
+          <input
+            autoFocus
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onBlur={() => {
+              handleCommit();
+              onCancelEdit();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleCommit();
+                e.currentTarget.blur();
+              } else if (e.key === "Escape") {
+                setValue(option);
+                e.currentTarget.blur();
+              }
+            }}
+            className="w-full min-w-0 border-0 border-b border-primary bg-transparent px-0 text-sm outline-none"
+          />
+        ) : (
+          <button
+            onClick={onStartEdit}
+            className="w-full min-w-0 cursor-text truncate text-left text-sm hover:underline hover:underline-offset-4 hover:decoration-muted-foreground/50"
+          >
+            {option}
+          </button>
+        )}
       </div>
       <button
         onClick={() => onRemove(option)}
@@ -81,6 +128,7 @@ function SortableOptionRow({ option, onRemove }: SortableOptionRowProps) {
 
 export function SelectOptionList({ options, onChange }: SelectOptionListProps) {
   const [newOption, setNewOption] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -110,6 +158,14 @@ export function SelectOptionList({ options, onChange }: SelectOptionListProps) {
 
   function removeOption(option: string) {
     onChange(options.filter((o) => o !== option));
+    if (editingId === option) setEditingId(null);
+  }
+
+  function commitOption(original: string, next: string) {
+    if (next === original || options.includes(next)) return false;
+    onChange(options.map((o) => (o === original ? next : o)));
+    setEditingId(null);
+    return true;
   }
 
   return (
@@ -127,6 +183,10 @@ export function SelectOptionList({ options, onChange }: SelectOptionListProps) {
             <SortableOptionRow
               key={option}
               option={option}
+              editing={editingId === option}
+              onStartEdit={() => setEditingId(option)}
+              onCommit={(next) => commitOption(option, next)}
+              onCancelEdit={() => setEditingId(null)}
               onRemove={removeOption}
             />
           ))}
