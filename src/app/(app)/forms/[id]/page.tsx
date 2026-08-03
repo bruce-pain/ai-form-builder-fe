@@ -200,8 +200,8 @@ export default function FormDetailPage({
         setResponses(
           [...responsesRes.data].sort(
             (a, b) =>
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime(),
+              new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime(),
           ),
         );
         setLoading(false);
@@ -312,7 +312,7 @@ export default function FormDetailPage({
   }
 
   const responseCount = responses.length;
-  const lastResponse = responses[0]?.created_at;
+  const lastResponse = responses[responses.length - 1]?.created_at;
   const currentResponse = responses[responseIndex] ?? responses[0];
   const publicUrl =
     typeof window !== "undefined"
