@@ -15,7 +15,7 @@ export function Header() {
           href="/dashboard"
           className="text-base font-medium tracking-tight"
         >
-          AI Form Builder
+          Formbrew
         </Link>
         <div className="flex items-center gap-2">
           <ThemeToggle />

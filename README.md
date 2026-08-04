@@ -1,10 +1,10 @@
 <div align="center">
 
-# AI Form Builder (Frontend)
+# Formbrew
 
 **Create, publish, and manage forms using natural language prompts powered by AI.**
 
-**Live:** [ai-form-builder-fe.vercel.app](https://ai-form-builder-fe.vercel.app) · [API Docs](https://ai-form-builder-be.onrender.com/v1/docs)
+**Live:** [formbrew.vercel.app](https://formbrew.vercel.app) · [API Docs](https://ai-form-builder-be.onrender.com/v1/docs)
 
 [![Next.js](https://img.shields.io/badge/Next.js_16-000000?logo=next.js&logoColor=white)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React_19-61DAFB?logo=react&logoColor=black)](https://react.dev)
@@ -21,7 +21,7 @@
 
 ## Overview
 
-AI Form Builder is a full-stack application that lets users create forms by simply describing them in plain English. An LLM generates the questions, title, and description automatically, and users can refine the result through natural conversation. No manual drag-and-drop builders needed.
+Formbrew is a full-stack application that lets users create forms by simply describing them in plain English. An LLM generates the questions, title, and description automatically, and users can refine the result through natural conversation. No manual drag-and-drop builders needed.
 
 The frontend is a **Next.js 16** (App Router) application written in **TypeScript**, styled with **Tailwind CSS v4** and **shadcn/ui**, and authenticated via **next-auth** with JWT. It consumes a FastAPI backend that handles form storage, AI generation, and response collection.
 
@@ -136,7 +136,7 @@ src/
 
 - **Node.js** >= 18
 - **pnpm**: install via `npm install -g pnpm` or [corepack](https://nodejs.org/api/corepack.html)
-- (Optional) A local instance of the [AI Form Builder backend](https://github.com/bruce-pain/AI-form-builder-be) — the app works with the deployed API out of the box
+- (Optional) A local instance of the [Formbrew backend](https://github.com/bruce-pain/AI-form-builder-be) — the app works with the deployed API out of the box
 
 ### Environment Variables
 
@@ -163,5 +163,5 @@ pnpm lint       # Run ESLint
 
 | Project                                                          | Description                                                                           |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| [AI-form-builder-fe](https://github.com/bruce-pain/ai-form-builder-fe) | Next.js frontend deployed at [ai-form-builder-fe.vercel.app](https://ai-form-builder-fe.vercel.app) |
+| [Formbrew (frontend)](https://github.com/bruce-pain/ai-form-builder-fe) | Next.js frontend deployed at [formbrew.vercel.app](https://formbrew.vercel.app) |
 | [AI-form-builder-be](https://github.com/bruce-pain/AI-form-builder-be) | FastAPI backend with LLM integration, form CRUD, authentication, and response storage — deployed at [ai-form-builder-be.onrender.com](https://ai-form-builder-be.onrender.com) |

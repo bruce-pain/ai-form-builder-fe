@@ -3,12 +3,16 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 export const OG = {
-  background: "#FAFAFA",
-  foreground: "#111111",
-  muted: "#737373",
-  hairline: "#E5E5E5",
-  card: "#FFFFFF",
-  skeleton: "#EEEEEE",
+  background: "#FEF2DF",
+  foreground: "#361C11",
+  muted: "#6E5547",
+  hairline: "#D9C7B7",
+  card: "#FFFBF3",
+  skeleton: "#F0DAC2",
+  accent: "#DC7B40",
+  accentForeground: "#250F07",
+  primary: "#562A19",
+  primaryForeground: "#FDF8ED",
 } as const;
 
 export function truncate(text: string, max: number): string {

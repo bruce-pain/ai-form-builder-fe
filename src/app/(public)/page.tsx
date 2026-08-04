@@ -8,11 +8,11 @@ export default async function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
       <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-        Describe your form. AI builds it.
+        Describe it. The form brews itself.
       </h1>
       <p className="mt-4 max-w-md text-muted-foreground">
         Type what you need in plain English. The AI generates questions, you
-        refine with chat. No drag-and-drop required.
+        refine with chat.
       </p>
       <div className="mt-8 flex gap-4">
         {session ? (

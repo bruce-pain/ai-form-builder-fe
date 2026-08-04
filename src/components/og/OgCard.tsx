@@ -49,7 +49,7 @@ function FormSkeleton() {
               height: 16,
               borderRadius: 999,
               border: row.selected ? "none" : `2px solid ${OG.hairline}`,
-              background: row.selected ? OG.foreground : "transparent",
+              background: row.selected ? OG.accent : "transparent",
             }}
           />
           <div
@@ -69,13 +69,13 @@ function FormSkeleton() {
           alignSelf: "flex-end",
           marginTop: 8,
           borderRadius: 999,
-          background: OG.foreground,
+          background: OG.primary,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <span style={{ color: OG.background, fontSize: 14, fontWeight: 600 }}>
+        <span style={{ color: OG.primaryForeground, fontSize: 14, fontWeight: 600 }}>
           Submit
         </span>
       </div>
@@ -118,11 +118,11 @@ export function OgCard({
               width: 12,
               height: 12,
               borderRadius: 3,
-              background: OG.foreground,
+              background: OG.accent,
             }}
           />
           <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: 3 }}>
-            AI FORM BUILDER
+            Formbrew
           </span>
         </div>
         <span
@@ -133,7 +133,7 @@ export function OgCard({
             fontFamily: "Inter",
           }}
         >
-          ai-form-builder-fe.vercel.app
+          formbrew.vercel.app
         </span>
       </div>
 
@@ -160,7 +160,7 @@ export function OgCard({
             style={{
               fontSize: 14,
               fontWeight: 600,
-              color: OG.muted,
+              color: OG.accent,
               fontFamily: "Inter",
               letterSpacing: 2.5,
             }}
