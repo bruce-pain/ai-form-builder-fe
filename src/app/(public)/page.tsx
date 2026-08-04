@@ -12,7 +12,7 @@ export default async function HomePage() {
       </h1>
       <p className="mt-4 max-w-md text-muted-foreground">
         Type what you need in plain English. The AI generates questions, you
-        refine with chat. No drag-and-drop required.
+        refine with chat.
       </p>
       <div className="mt-8 flex gap-4">
         {session ? (
