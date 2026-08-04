@@ -15,6 +15,16 @@ export const OG = {
   primaryForeground: "#FDF8ED",
 } as const;
 
+const DEFAULT_SITE_URL = "https://formbrew.vercel.app";
+
+export function getSiteUrl(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL;
+}
+
+export function getSiteHostname(): string {
+  return new URL(getSiteUrl()).hostname;
+}
+
 export function truncate(text: string, max: number): string {
   const trimmed = text.trim();
   if (trimmed.length <= max) return trimmed;

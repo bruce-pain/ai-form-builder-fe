@@ -1,4 +1,4 @@
-import { OG } from "@/lib/og";
+import { getSiteHostname, OG } from "@/lib/og";
 
 interface OgCardProps {
   eyebrow: string;
@@ -133,7 +133,7 @@ export function OgCard({
             fontFamily: "Inter",
           }}
         >
-          formbrew.vercel.app
+          {getSiteHostname()}
         </span>
       </div>
 

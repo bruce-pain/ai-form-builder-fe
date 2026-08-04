@@ -145,7 +145,12 @@ Create `.env.local` in the project root:
 ```env
 AUTH_SECRET=<generate with: openssl rand -base64 32>
 NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
+
+> `NEXT_PUBLIC_SITE_URL` is used to build the base URL for social-preview
+> (`og:image`) metadata. In production, set it to your deployed domain (e.g.
+> `https://formbrew.vercel.app`).
 
 ### Install & Run
 

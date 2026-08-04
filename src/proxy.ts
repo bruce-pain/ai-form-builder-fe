@@ -5,8 +5,11 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isLoggedIn = !!req.auth;
 
+  const isMetadataImage = pathname === "/opengraph-image";
   const isPublicPage =
-    pathname === "/" || pathname.startsWith("/forms/public/");
+    pathname === "/" ||
+    pathname.startsWith("/forms/public/") ||
+    isMetadataImage;
   const isAuthPage =
     pathname.startsWith("/login") || pathname.startsWith("/register");
   const isApiAuth = pathname.startsWith("/api/auth");
