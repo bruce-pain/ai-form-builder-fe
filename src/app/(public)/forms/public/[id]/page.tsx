@@ -27,7 +27,7 @@ function PoweredByFooter() {
   return (
     <footer className="text-center text-xs text-muted-foreground">
       <Link href="/" className="hover:underline">
-        Powered by AI Form Builder
+        Powered by Formbrew
       </Link>
     </footer>
   );

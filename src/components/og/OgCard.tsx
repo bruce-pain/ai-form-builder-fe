@@ -122,7 +122,7 @@ export function OgCard({
             }}
           />
           <span style={{ fontSize: 16, fontWeight: 600, letterSpacing: 3 }}>
-            AI FORM BUILDER
+            Formbrew
           </span>
         </div>
         <span
@@ -133,7 +133,7 @@ export function OgCard({
             fontFamily: "Inter",
           }}
         >
-          ai-form-builder-fe.vercel.app
+          formbrew.vercel.app
         </span>
       </div>
 

@@ -16,7 +16,7 @@ export async function GET(
   let description: string | undefined =
     "The form you're looking for doesn't exist or hasn't been published.";
   let meta: string | undefined;
-  const footer = "Describe your form. AI builds it.";
+  const footer = "Describe it. The form brews itself.";
 
   try {
     const form = await getPublicForm(id);

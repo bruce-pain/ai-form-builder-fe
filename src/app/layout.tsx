@@ -16,23 +16,23 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-form-builder-fe.vercel.app";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://formbrew.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "AI Form Builder",
-  description: "Describe your form. AI builds it.",
+  title: "Formbrew",
+  description: "Describe it. The form brews itself.",
   openGraph: {
     type: "website",
-    siteName: "AI Form Builder",
+    siteName: "Formbrew",
     locale: "en_US",
-    title: "AI Form Builder",
-    description: "Describe your form. AI builds it.",
+    title: "Formbrew",
+    description: "Describe it. The form brews itself.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Form Builder",
-    description: "Describe your form. AI builds it.",
+    title: "Formbrew",
+    description: "Describe it. The form brews itself.",
   },
 };
 
