@@ -13,7 +13,7 @@
 [![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-000000?logo=shadcnui&logoColor=white)](https://ui.shadcn.com)
 [![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io)
 
-[Backend API →](https://github.com/bruce-pain/AI-form-builder-be)
+[Backend API →](https://github.com/bruce-pain/formbrew-be)
 
 </div>
 
@@ -136,7 +136,7 @@ src/
 
 - **Node.js** >= 18
 - **pnpm**: install via `npm install -g pnpm` or [corepack](https://nodejs.org/api/corepack.html)
-- (Optional) A local instance of the [Formbrew backend](https://github.com/bruce-pain/AI-form-builder-be) — the app works with the deployed API out of the box
+- (Optional) A local instance of the [Formbrew backend](https://github.com/bruce-pain/formbrew-be) — the app works with the deployed API out of the box
 
 ### Environment Variables
 
@@ -168,5 +168,5 @@ pnpm lint       # Run ESLint
 
 | Project                                                          | Description                                                                           |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| [Formbrew (frontend)](https://github.com/bruce-pain/ai-form-builder-fe) | Next.js frontend deployed at [formbrew.vercel.app](https://formbrew.vercel.app) |
-| [AI-form-builder-be](https://github.com/bruce-pain/AI-form-builder-be) | FastAPI backend with LLM integration, form CRUD, authentication, and response storage — deployed at [ai-form-builder-be.onrender.com](https://ai-form-builder-be.onrender.com) |
+| [Formbrew (frontend)](https://github.com/bruce-pain/formbrew-fe) | Next.js frontend deployed at [formbrew.vercel.app](https://formbrew.vercel.app) |
+| [Formbrew API](https://github.com/bruce-pain/formbrew-be) | FastAPI backend with LLM integration, form CRUD, authentication, and response storage — deployed at [ai-form-builder-be.onrender.com](https://ai-form-builder-be.onrender.com) |
