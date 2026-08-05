@@ -34,7 +34,7 @@ export function FormPreview({
     <div className="space-y-4">
       <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
         <Eye className="size-4" />
-        Preview mode — responses won&apos;t be saved
+        Preview mode: responses won&apos;t be saved
       </div>
 
       <Card>

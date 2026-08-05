@@ -17,7 +17,7 @@ export default async function Image() {
       eyebrow="DESCRIBE · BUILD · SHARE"
       title="Describe it. The form brews itself."
       description="Type what you need in plain English. The AI generates questions, you refine with chat."
-      footer="Create, share, and collect responses — instantly."
+      footer="Create, share, and collect responses instantly."
     />,
     { ...size, fonts },
   );
