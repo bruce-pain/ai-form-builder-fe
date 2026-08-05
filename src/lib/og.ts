@@ -34,9 +34,9 @@ export function truncate(text: string, max: number): string {
 const loadFonts = cache(async () => {
   const dir = join(process.cwd(), "src/lib/fonts");
   const fonts = [
-    { name: "Inter", file: "Inter_18pt-Regular.ttf", weight: 400 },
-    { name: "Inter", file: "Inter_18pt-SemiBold.ttf", weight: 600 },
-    { name: "Inter", file: "Inter_18pt-Bold.ttf", weight: 700 },
+    { name: "Bricolage Grotesque", file: "BricolageGrotesque-Regular.ttf", weight: 400 },
+    { name: "Bricolage Grotesque", file: "BricolageGrotesque-SemiBold.ttf", weight: 600 },
+    { name: "Bricolage Grotesque", file: "BricolageGrotesque-Bold.ttf", weight: 700 },
   ] as const;
 
   return Promise.all(

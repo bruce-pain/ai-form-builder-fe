@@ -99,7 +99,7 @@ export function OgCard({
         height: "100%",
         background: OG.background,
         color: OG.foreground,
-        fontFamily: "Inter",
+        fontFamily: "Bricolage Grotesque",
         padding: "56px 64px",
       }}
     >
@@ -130,7 +130,6 @@ export function OgCard({
             fontSize: 14,
             fontWeight: 600,
             color: OG.muted,
-            fontFamily: "Inter",
           }}
         >
           {getSiteHostname()}
@@ -161,7 +160,6 @@ export function OgCard({
               fontSize: 14,
               fontWeight: 600,
               color: OG.accent,
-              fontFamily: "Inter",
               letterSpacing: 2.5,
             }}
           >
@@ -190,7 +188,6 @@ export function OgCard({
                 fontSize: 15,
                 fontWeight: 600,
                 color: OG.muted,
-                fontFamily: "Inter",
                 letterSpacing: 1.5,
               }}
             >
