@@ -1,35 +1,28 @@
 import { auth } from "@/auth";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Faq } from "@/components/landing/faq";
+import { Features } from "@/components/landing/features";
+import { FinalCta } from "@/components/landing/final-cta";
+import { Hero } from "@/components/landing/hero";
+import { HowItWorks } from "@/components/landing/how-it-works";
+import { LandingFooter } from "@/components/landing/landing-footer";
+import { LandingHeader } from "@/components/landing/landing-header";
+import { Showcase } from "@/components/landing/showcase";
 
 export default async function HomePage() {
   const session = await auth();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
-      <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-        Describe it. The form brews itself.
-      </h1>
-      <p className="mt-4 max-w-md text-muted-foreground">
-        Type what you need in plain English. The AI generates questions, you
-        refine with chat.
-      </p>
-      <div className="mt-8 flex gap-4">
-        {session ? (
-          <Button asChild>
-            <Link href="/dashboard">Go to dashboard</Link>
-          </Button>
-        ) : (
-          <>
-            <Button asChild>
-              <Link href="/register">Get started</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/login">Log in</Link>
-            </Button>
-          </>
-        )}
-      </div>
-    </main>
+    <div className="flex min-h-screen flex-col">
+      <LandingHeader isAuthed={Boolean(session)} />
+      <main className="flex-1">
+        <Hero isAuthed={Boolean(session)} />
+        <HowItWorks />
+        <Features />
+        <Showcase />
+        <Faq />
+        <FinalCta isAuthed={Boolean(session)} />
+      </main>
+      <LandingFooter />
+    </div>
   );
 }
